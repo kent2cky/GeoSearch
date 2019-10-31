@@ -1,0 +1,34 @@
+{
+  "name": "geosearch",
+  "version": "1.0.0",
+  "description": "My DevC capstone project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kent2cky/GeoSearch.git"
+  },
+  "author": "Kenny",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kent2cky/GeoSearch/issues"
+  },
+  "homepage": "https://github.com/kent2cky/GeoSearch#readme",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "browser-sync": "^2.26.7",
+    "gulp": "^4.0.2",
+    "gulp-babel": "^8.0.0",
+    "gulp-imagemin": "^6.1.1",
+    "gulp-jshint": "^2.1.0",
+    "gulp-uglify": "^3.0.2",
+    "jshint": "^2.10.2",
+    "run-sequence": "^2.2.1"
+  },
+  "dependencies": {
+    "@babel/core": "^7.6.4"
+  }
+}
