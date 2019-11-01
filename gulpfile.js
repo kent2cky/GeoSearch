@@ -31,17 +31,16 @@ gulp.task('processJS', gulp.series((done) => {
 		.pipe(uglify())
 		.pipe(gulp.dest('dist'));
 
-	console.log('ProcessJS done!');
 	done();
 }));
 
-function imageSquash() {
-	return gulp.src('/img/*')
-		.pipe(imageMin())
-		.pipe(gulp.dest('dist/minImages/'));
-}
 
-gulp.task('imageSquash', imageSquash);
+gulp.task('imageSquash', gulp.series((done) => {
+	gulp.src("img/*")
+		.pipe(imageMin())
+		.pipe(gulp.dest('dist/minImages'));
+	done()
+}));
 
 
 gulp.task('babelPolyfill', gulp.series((done) => {
@@ -93,5 +92,5 @@ gulp.task('watchProdCSS', (done) => {
 gulp.task('watch', gulp.parallel('browserSync', 'watchJS', 'watchHTML', 'watchCSS', 'watchProdJS', 'watchProdHTML', 'watchProdCSS'));
 
 gulp.task('default', gulp.series(
-	'processHTML', 'processJS', 'processCSS', 'babelPolyfill', 'watch'
+	'processHTML', 'processJS', 'processCSS', 'babelPolyfill', 'imageSquash', 'watch'
 ));

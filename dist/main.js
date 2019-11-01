@@ -1,1 +1,1 @@
-"use strict";$(document).ready(console.log("Na purple tingzz now oo!")),$(document).ready(console.log("Lets make the color white."));
+"use strict";$(document).ready(console.log("We are live!"));
