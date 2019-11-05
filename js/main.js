@@ -21,3 +21,11 @@ $(document).ready(console.log("We are live!"));
 //     }, 4000);
 
 // });
+
+$(".nav_handle-container").click(() => {
+    if ($(".toggled").is(":visible")) {
+        $(".toggled").hide(200);
+        return;
+    }
+    $(".toggled").show(200);
+});

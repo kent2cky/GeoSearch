@@ -1,1 +1,1 @@
-"use strict";$(document).ready(console.log("We are live!"));
+"use strict";$(document).ready(console.log("We are live!")),$(".nav_handle-container").click(function(){$(".toggled").is(":visible")?$(".toggled").hide(200):$(".toggled").show(200)});

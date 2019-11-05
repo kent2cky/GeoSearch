@@ -4,47 +4,54 @@
 
 <head>
     <meta charset="utf-8" />
-    <script src="jquery-3.4.1.min.js" type="text/javascript"></script>
-    <script src="main.js" type="text/javascript"></script>
+    <title>GeoSearch</title>
+    <meta name="description" content="Free Web tutorials">
+    <meta name="keywords"
+        content="GeoSearch, DevC Capstone Project, Andela Facebook training, kent2ckymaduka@gmail.com, Ikenna Kennis Maduka">
+    <meta name="author" content="kent2ckymaduka@gmail.com">
     <link rel="stylesheet" href="main.css" type="text/css">
-
-    <style>
-        #map {
-            width: 80%;
-            height: 400px;
-            background-color: grey;
-        }
-    </style>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
 <body>
 
     <header>
-        <h1>GeoSearch</h1>
-        <span><a href="about.html">About</a></span>
-    </header>
-    <main>
+        <nav class="nav-container">
+            <h1>GeoSearch</h1>
 
+            <div class="nav_handle-container" type="button" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <div class="toggled" role="Toggle navigation">
+                <ul class="nav-items-list" id="list">
+                    <li id="">
+                        <span><a id="about" href="about.html">About</a></span>
+                    </li>
+                    <li id="getInspired">
+                        <span><a id="search" href="about.html">Search</a></span>
+                    </li>
+
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
         <div class="welcome-image">
             <img src="minImages/870-536x354-blur_2-grayscale.jpg" alt="image from unsplash">
         </div>
-        <a href="map.html">go to map</a><br>
-        <a href="#search">go to search</a><br>
-        <a href="#search-results">go to search results</a> <br><br><br><br>
-        <br><br><br><br>
-        <br><br><br><br>
-        <br><br><br><br>
 
+        <h2 class="welcome">Welcome to GeoSearch</h2>
 
-        <h2>Welcome to GeoSearch!</h2>
-
-        <p>Search for that places you are interested in.</p>
-
-        <section id="search">
+        <section id="search-section">
+            <p>Search for that place that interests you.</p>
             <form action="submit">
                 <input type="text" placeholder="Enter name of place....">
-                <button>Find</button>
+                <button id="submit-button">Find</button>
             </form>
         </section>
 
@@ -61,20 +68,19 @@
                     <div class="prev"></div>
                 </div>
 
-                <div class="place-images">
-                    <img src="minImages/866-536x354.jpg" alt="placeholder images" height="100" width="100" srcset="">
-                    <img src="minImages/870-536x354-blur_2-grayscale.jpg" alt="placeholder images" height="100"
-                        width="100" srcset="">
-                    <img src="minImages/237-536x354.jpg" alt="placeholder images" height="100" width="100" srcset="">
-                    <img src="minImages/1084-536x354-grayscale.jpg" alt="placeholder images" height="100" width="100"
+                <div class="landmarks">
+                    <img src="minImages/866-536x354.jpg" alt="placeholder images" height="70" width="70" srcset="">
+                    <img src="minImages/870-536x354-blur_2-grayscale.jpg" alt="placeholder images" height="70"
+                        width="70" srcset="">
+                    <img src="minImages/237-536x354.jpg" alt="placeholder images" height="70" width="70" srcset="">
+                    <img src="minImages/1084-536x354-grayscale.jpg" alt="placeholder images" height="70" width="70"
                         srcset="">
                 </div>
 
+                <h3 class="place-info">Place information</h3>
+
 
                 <table class="place-info">
-                    <tr>
-                        <th>Place Information</th>
-                    </tr>
                     <tr>
                         <td>Humidity</td>
                         <td id="humidity">Not so humid</td>
@@ -109,8 +115,8 @@
             </div>
 
             <div class="share">
-                <button disabled="disabled">
-                    share
+                <button id="fb-share" disabled="disabled">
+                    Share to facebook
                 </button>
             </div>
 
@@ -118,13 +124,39 @@
 
     </main>
 
-    <br><br><br><br>
 
     <footer>
+        Email: <a href="mailto:kent2ckymaduka@gmail.com">kent2ckymaduka@gmail.com</a><br>
+        Mobile: <a href="tel:+2347062685682">(+234)07062685682</a><br>
         Copyright kent2cky-2019
-        Email: <a href="mailto:kent2ckymaduka@gmail.com">kent2ckymaduka@gmail.com</a>
-        Mobile: <a href="tel:+2347062685682">(+234)07062685682</a>
     </footer>
+    <!-- <script>
+        // Initialize and add the map
+        function initMap() {
+            // The location of Uluru
+            var uluru = {
+                lat: 6.1329,
+                lng: 6.7924
+            };
+            // The map, centered at Uluru
+            var map = new google.maps.Map(
+                document.getElementById('map'), {
+                    zoom: 8,
+                    center: uluru
+                });
+            // The marker, positioned at Uluru
+            var marker = new google.maps.Marker({
+                position: uluru,
+                map: map
+            });
+        }
+    </script>
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBNYcmllOQLnpkLyxHN99e74U1ZT3Gz4iI&callback=initMap">
+    </script> -->
+    <script src="jquery-3.4.1.min.js" type="text/javascript"></script>
+    <script src="main.js" type="text/javascript"></script>
+
 </body>
 
 </html>

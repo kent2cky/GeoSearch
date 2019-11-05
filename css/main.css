@@ -1,4 +1,197 @@
 * {
-    background: purple;
-    color: white;
+  box-sizing: border-box;
+}
+
+html {
+  color: #3d3535;
+  font-size: 14px;
+}
+
+body {
+  margin: 0px;
+}
+
+header {
+  display: flex;
+  background-color: #3e064e;
+  flex-flow: row wrap;
+  justify-content: space-around;
+  align-items: center;
+  margin: 0px;
+}
+
+.nav-container {
+  display: inline-block;
+  position: relative;
+  width: 100%;
+  padding: 0px 15px 0px 15px;
+  color: white;
+}
+
+nav > h1 {
+  display: inline-block;
+  font-size: 1.7em;
+}
+
+.toggled {
+  display: none;
+}
+
+.toggled > ul {
+  list-style: none;
+  text-align: left;
+  padding: 0;
+  margin: 0;
+}
+
+.nav_handle-container {
+  position: relative;
+  height: 25px;
+  top: 26px;
+  width: 40px;
+  right: auto;
+  cursor: pointer;
+  float: right;
+  border: none;
+  background: inherit;
+}
+
+.nav-items-list > li {
+  padding: 10px;
+  margin: 1px;
+}
+
+#list a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.nav_handle-container > span {
+  background: white;
+  height: 2px;
+  width: 30px;
+  margin: 0px;
+  position: absolute;
+  /* Apparently this centres the spans. Leave it like that.*/
+  right: 5px;
+}
+
+.nav_handle-container span:nth-child(1) {
+  top: 0;
+}
+
+.nav_handle-container span:nth-child(2) {
+  top: 8px;
+}
+
+.nav_handle-container span:nth-child(3) {
+  top: 17px;
+}
+
+.welcome-image > img {
+  width: 96%;
+  height: 200px;
+  margin: 0px 7px;
+}
+
+.welcome {
+  text-transform: uppercase;
+  font-size: 1.4em;
+  padding: 100px 24px;
+  text-align: center;
+  margin: 1px;
+  background-color: darkgrey;
+}
+
+#search-section {
+  display: flex;
+  flex-flow: column wrap;
+  align-items: center;
+  font-size: 1.2em;
+  padding: 100px 0px;
+  margin: 1px;
+  background-color: rosybrown;
+}
+
+form {
+  text-align: center;
+}
+
+input {
+  display: block;
+  margin: 40px 40px 15px 40px;
+  height: 35px;
+  border: 1px solid #3e064e;
+  border-radius: 4px;
+}
+
+#submit-button {
+  background-color: darkgrey;
+  border: 1px solid #3e064e;
+  border-radius: 4px;
+  padding: 5px 20px;
+}
+
+#submit-button:hover {
+  background-color: lightgray;
+}
+
+#search-results {
+  width: 99vw;
+  display: inline-block;
+  background-color: bisque;
+  margin: 1px;
+  text-align: center;
+}
+
+.about-place > h3 {
+  text-transform: uppercase;
+}
+
+.landmarks {
+  padding: repeat(4);
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-evenly;
+  align-content: center;
+  margin: 5px 0 0 0;
+}
+
+table {
+  text-align: start;
+  margin: 20px;
+}
+
+#convert {
+  background-color: inherit;
+  padding: 3px;
+  border: 1px solid black;
+  border-radius: 3px;
+  color: inherit;
+}
+
+#fb-share {
+  background-image: url("minImages/facebook2.jpeg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  color: #3d353500;
+  width: 75px;
+  height: 28px;
+  border: none;
+}
+
+footer {
+  background: cyan;
+  padding: 24px;
+  text-align: center;
+  line-height: 20px;
+}
+
+/* Set the size of the div element that contains the map */
+#map {
+  height: 400px;
+  /* The height is 400 pixels */
+  width: 100%;
+  /* The width is the width of the web page */
+  background: gray;
 }
