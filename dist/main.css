@@ -5,6 +5,7 @@
 html {
   color: #3d3535;
   font-size: 14px;
+  line-height: 20px;
 }
 
 body {
@@ -61,7 +62,8 @@ nav > h1 {
   margin: 1px;
 }
 
-#list a {
+#list a,
+footer a {
   color: inherit;
   text-decoration: none;
 }
@@ -88,19 +90,33 @@ nav > h1 {
   top: 17px;
 }
 
+main {
+  display: flex;
+  flex-flow: column wrap;
+  justify-content: center;
+  align-items: center;
+  padding: 0%;
+}
+
 .welcome-image > img {
   width: 96%;
   height: 200px;
-  margin: 0px 7px;
+}
+
+.welcome-image {
+  background-color: cadetblue;
+  width: 90%;
+  height: 150px;
 }
 
 .welcome {
   text-transform: uppercase;
-  font-size: 1.4em;
+  font-size: 1.1em;
+  line-height: 25px;
   padding: 100px 24px;
   text-align: center;
   margin: 1px;
-  background-color: darkgrey;
+  background-color: darkpgrey;
 }
 
 #search-section {
@@ -108,9 +124,9 @@ nav > h1 {
   flex-flow: column wrap;
   align-items: center;
   font-size: 1.2em;
-  padding: 100px 0px;
+  padding: 100px 20px 170px 20px;
   margin: 1px;
-  background-color: rosybrown;
+  background-color: rospybrown;
 }
 
 form {
@@ -121,25 +137,27 @@ input {
   display: block;
   margin: 40px 40px 15px 40px;
   height: 35px;
-  border: 1px solid #3e064e;
-  border-radius: 4px;
+  border: 1px solid black;
+  border-radius: 1em;
+  padding: 8px;
 }
 
 #submit-button {
-  background-color: darkgrey;
-  border: 1px solid #3e064e;
+  background-color: #3e064e;
+  color: white;
+  border: 0px;
   border-radius: 4px;
   padding: 5px 20px;
 }
 
 #submit-button:hover {
-  background-color: lightgray;
+  background-color: #65436e;
 }
 
 #search-results {
   width: 99vw;
   display: inline-block;
-  background-color: bisque;
+  background-color: bihsque;
   margin: 1px;
   text-align: center;
 }
@@ -148,13 +166,29 @@ input {
   text-transform: uppercase;
 }
 
+.about-geosearch {
+  padding: 15px;
+}
+
 .landmarks {
-  padding: repeat(4);
   display: flex;
   flex-flow: row wrap;
   justify-content: space-evenly;
   align-content: center;
   margin: 5px 0 0 0;
+}
+
+.landmarks span:nth-child(1),
+.landmarks span:nth-child(2),
+.landmarks span:nth-child(3),
+.landmarks span:nth-child(4) {
+  width: 5.5em;
+  height: 5.5em;
+  background-image: url("minImages/Spinner-1s-200px.gif");
+  background-repeat: no-repeat;
+  background-size: contain;
+  border: 1px solid black;
+  border-radius: 5px;
 }
 
 table {
@@ -181,10 +215,10 @@ table {
 }
 
 footer {
-  background: cyan;
+  color: white;
+  background: #3e064e;
   padding: 24px;
   text-align: center;
-  line-height: 20px;
 }
 
 /* Set the size of the div element that contains the map */
@@ -194,4 +228,92 @@ footer {
   width: 100%;
   /* The width is the width of the web page */
   background: gray;
+}
+
+/* Style overrides for other screen sizes (mobile first
+approach was used for the styling of this app) */
+
+@media screen and (min-width: 500px) {
+  .nav_handle-container {
+    display: none;
+  }
+
+  .nav-container {
+    display: flex;
+    background-color: #3e064e;
+    flex-flow: row wrap;
+    justify-content: space-around;
+    align-items: center;
+    margin: 0px;
+  }
+
+  .toggled {
+    display: inline-block;
+  }
+
+  .nav-items-list > li {
+    display: inline;
+  }
+
+  .welcome,
+  #search-section,
+  #search-results {
+    width: 80%;
+  }
+
+  #search {
+    background-color: green;
+    border-radius: 4px;
+    padding: 0.6em;
+  }
+
+  input {
+    width: 20em;
+    height: 3em;
+    border-radius: 1em;
+  }
+
+  #submit-button {
+    padding: 1em 3em;
+  }
+
+  .landmarks {
+    justify-content: center;
+  }
+
+  .landmarks span:nth-child(1),
+  .landmarks span:nth-child(2),
+  .landmarks span:nth-child(3),
+  .landmarks span:nth-child(4) {
+    width: 6em;
+    height: 6em;
+    margin: 0.4em;
+  }
+
+  table {
+    display: inline-block;
+  }
+
+  .share {
+    padding-bottom: 10px;
+  }
+}
+
+@media screen and (min-width: 800px) {
+  html {
+    font-size: 17px;
+  }
+  input {
+    width: 30em;
+    height: 4em;
+    border-radius: 1em;
+  }
+  .landmarks span:nth-child(1),
+  .landmarks span:nth-child(2),
+  .landmarks span:nth-child(3),
+  .landmarks span:nth-child(4) {
+    width: 7.5em;
+    height: 7.5em;
+    margin: 0.4em;
+  }
 }

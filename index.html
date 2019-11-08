@@ -32,7 +32,7 @@
                         <span><a id="about" href="about.html">About</a></span>
                     </li>
                     <li id="getInspired">
-                        <span><a id="search" href="about.html">Search</a></span>
+                        <span><a id="search" href="#search-section">Search</a></span>
                     </li>
 
                 </ul>
@@ -45,17 +45,18 @@
             <img src="minImages/870-536x354-blur_2-grayscale.jpg" alt="image from unsplash">
         </div>
 
-        <h2 class="welcome">Welcome to GeoSearch</h2>
-
+        <div class="welcome">
+            <h2>Welcome to GeoSearch</h2>
+        </div>
         <section id="search-section">
-            <p>Search for that place that interests you.</p>
+            <p>Search for those places that interest you.</p>
             <form action="submit">
-                <input type="text" placeholder="Enter name of place....">
-                <button id="submit-button">Find</button>
+                <input type="text" autofocus>
+                <button id="submit-button">Search</button>
             </form>
         </section>
 
-        <section id="search-results">
+        <section id="search-results" style="display: none">
             <div class="about-place">
                 <h3>Onitsha</h3>
                 <div class="image-primary">
@@ -69,12 +70,10 @@
                 </div>
 
                 <div class="landmarks">
-                    <img src="minImages/866-536x354.jpg" alt="placeholder images" height="70" width="70" srcset="">
-                    <img src="minImages/870-536x354-blur_2-grayscale.jpg" alt="placeholder images" height="70"
-                        width="70" srcset="">
-                    <img src="minImages/237-536x354.jpg" alt="placeholder images" height="70" width="70" srcset="">
-                    <img src="minImages/1084-536x354-grayscale.jpg" alt="placeholder images" height="70" width="70"
-                        srcset="">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
                 </div>
 
                 <h3 class="place-info">Place information</h3>
@@ -130,7 +129,7 @@
         Mobile: <a href="tel:+2347062685682">(+234)07062685682</a><br>
         Copyright kent2cky-2019
     </footer>
-    <!-- <script>
+    <script>
         // Initialize and add the map
         function initMap() {
             // The location of Uluru
@@ -153,7 +152,7 @@
     </script>
     <script async defer
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBNYcmllOQLnpkLyxHN99e74U1ZT3Gz4iI&callback=initMap">
-    </script> -->
+    </script>
     <script src="jquery-3.4.1.min.js" type="text/javascript"></script>
     <script src="main.js" type="text/javascript"></script>
 
