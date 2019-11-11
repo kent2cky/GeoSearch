@@ -98,6 +98,18 @@ main {
   padding: 0%;
 }
 
+#search-section,
+input,
+#search-results,
+#submit-button,
+#fb-share,
+.landmarks span:nth-child(1),
+.landmarks span:nth-child(2),
+.landmarks span:nth-child(3),
+.landmarks span:nth-child(4) {
+  box-shadow: 0px 3px 6px #8f867b;
+}
+
 .welcome-image > img {
   width: 96%;
   height: 200px;
@@ -113,9 +125,9 @@ main {
   text-transform: uppercase;
   font-size: 1.1em;
   line-height: 25px;
-  padding: 100px 24px;
   text-align: center;
-  margin: 1px;
+  padding: 100px 24px;
+  margin: 2px;
   background-color: darkpgrey;
 }
 
@@ -125,8 +137,7 @@ main {
   align-items: center;
   font-size: 1.2em;
   padding: 100px 20px 170px 20px;
-  margin: 1px;
-  background-color: rospybrown;
+  text-align: center;
 }
 
 form {
@@ -137,7 +148,7 @@ input {
   display: block;
   margin: 40px 40px 15px 40px;
   height: 35px;
-  border: 1px solid black;
+  border: 0px;
   border-radius: 1em;
   padding: 8px;
 }
@@ -147,7 +158,7 @@ input {
   color: white;
   border: 0px;
   border-radius: 4px;
-  padding: 5px 20px;
+  padding: 0.5em 1.3em;
 }
 
 #submit-button:hover {
@@ -160,6 +171,8 @@ input {
   background-color: bihsque;
   margin: 1px;
   text-align: center;
+  margin: 100px 0px 170px 0px;
+  padding-bottom: 20px;
 }
 
 .about-place > h3 {
@@ -187,7 +200,6 @@ input {
   background-image: url("minImages/Spinner-1s-200px.gif");
   background-repeat: no-repeat;
   background-size: contain;
-  border: 1px solid black;
   border-radius: 5px;
 }
 
@@ -274,7 +286,7 @@ approach was used for the styling of this app) */
   }
 
   #submit-button {
-    padding: 1em 3em;
+    padding: 0.8em 2em;
   }
 
   .landmarks {
@@ -301,7 +313,7 @@ approach was used for the styling of this app) */
 
 @media screen and (min-width: 800px) {
   html {
-    font-size: 17px;
+    font-size: 1em;
   }
   input {
     width: 30em;
