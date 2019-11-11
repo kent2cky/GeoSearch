@@ -29,7 +29,7 @@ header {
   color: white;
 }
 
-nav > h1 {
+nav>h1 {
   display: inline-block;
   font-size: 1.7em;
 }
@@ -38,7 +38,7 @@ nav > h1 {
   display: none;
 }
 
-.toggled > ul {
+.toggled>ul {
   list-style: none;
   text-align: left;
   padding: 0;
@@ -57,7 +57,7 @@ nav > h1 {
   background: inherit;
 }
 
-.nav-items-list > li {
+.nav-items-list>li {
   padding: 10px;
   margin: 1px;
 }
@@ -68,7 +68,7 @@ footer a {
   text-decoration: none;
 }
 
-.nav_handle-container > span {
+.nav_handle-container>span {
   background: white;
   height: 2px;
   width: 30px;
@@ -110,7 +110,7 @@ input,
   box-shadow: 0px 3px 6px #8f867b;
 }
 
-.welcome-image > img {
+.welcome-image>img {
   width: 96%;
   height: 200px;
 }
@@ -149,7 +149,7 @@ input {
   margin: 40px 40px 15px 40px;
   height: 35px;
   border: 0px;
-  border-radius: 1em;
+  border-radius: 2em;
   padding: 8px;
 }
 
@@ -175,7 +175,7 @@ input {
   padding-bottom: 20px;
 }
 
-.about-place > h3 {
+.about-place>h3 {
   text-transform: uppercase;
 }
 
@@ -263,7 +263,7 @@ approach was used for the styling of this app) */
     display: inline-block;
   }
 
-  .nav-items-list > li {
+  .nav-items-list>li {
     display: inline;
   }
 
@@ -282,7 +282,7 @@ approach was used for the styling of this app) */
   input {
     width: 20em;
     height: 3em;
-    border-radius: 1em;
+    border-radius: 2em;
   }
 
   #submit-button {
@@ -315,11 +315,13 @@ approach was used for the styling of this app) */
   html {
     font-size: 1em;
   }
+
   input {
     width: 30em;
     height: 4em;
-    border-radius: 1em;
+    border-radius: 2em;
   }
+
   .landmarks span:nth-child(1),
   .landmarks span:nth-child(2),
   .landmarks span:nth-child(3),

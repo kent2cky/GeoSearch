@@ -1,12 +1,8 @@
 const gulp = require('gulp');
 const jshint = require('gulp-jshint');
 const babel = require('gulp-babel');
-<<<<<<< HEAD
-const uglify = require('gulp-uglify');
-=======
 const terser = require('gulp-terser');
 // const uglify = require('gulp-uglify');
->>>>>>> 597dfe7... style(map marker):customize map marker
 const browserSync = require('browser-sync').create();
 const imageMin = require('gulp-imagemin')
 
@@ -30,17 +26,10 @@ gulp.task('processJS', gulp.series((done) => {
 			esversion: 6
 		}))
 		.pipe(jshint.reporter('default'))
-<<<<<<< HEAD
-		.pipe(babel({
-			presets: ['env']
-		}))
-		.pipe(uglify())
-=======
 		// .pipe(babel({
 		// 	presets: ['env']
 		// }))
 		.pipe(terser())
->>>>>>> 597dfe7... style(map marker):customize map marker
 		.pipe(gulp.dest('dist'));
 
 	done();
