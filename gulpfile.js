@@ -29,7 +29,7 @@ gulp.task('processJS', gulp.series((done) => {
 		// .pipe(babel({
 		// 	presets: ['env']
 		// }))
-		.pipe(terser())
+		// .pipe(terser())
 		.pipe(gulp.dest('dist'));
 
 	done();

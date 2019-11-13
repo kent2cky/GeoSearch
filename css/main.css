@@ -21,6 +21,10 @@ header {
   margin: 0px;
 }
 
+.suggestions {
+  background: cadetblue;
+}
+
 .nav-container {
   display: inline-block;
   position: relative;
