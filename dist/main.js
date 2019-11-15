@@ -24,6 +24,30 @@ function createAndAppendAutoCompleteElements(suggestions) {
   $('form').append(result);
 }
 
+class TemperatureConverter {
+  constructor(temperature = 'no null parameter', metricSystem = 'celsius') {
+    this.temperature = temperature;
+    this.metricSystem = metricSystem;
+  }
+
+  convertToCelsius(temperature) {
+    this.celsTemp = (temperature - 32) * (5 / 9);
+    return Math.ceil(this.celsTemp * 100) / 100;
+  }
+
+  convertToFahrenheit(temperature) {
+    this.fahrTemp = temperature * (9 / 5) + 32;
+    return Math.ceil(this.fahrTemp * 100) / 100;
+  }
+
+  getCurrentMetricSystem() {
+    return this.metricSystem;
+  }
+
+  setCurrentMetricSystem(system) {
+    this.metricSystem = system;
+  }
+}
 
 // this handles the navigation toggle functionality.
 $('.nav_handle-container').click(() => {
@@ -331,4 +355,8 @@ $(document).ready(() => {
   //     console.log(res);
   //     return getLandmarksAroundSearchedPlace(res);
   //   });
+
+  const converter = new TemperatureConverter();
+  console.log(converter.convertToCelsius(30));
+  console.log(converter.convertToFahrenheit(-1.11)); // 30 °F-1.11
 });
