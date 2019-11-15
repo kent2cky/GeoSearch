@@ -1,7 +1,6 @@
 const APPLICATION_ID = localStorage.getItem('_appId');
 const APPLICATION_CODE = localStorage.getItem('_appCode');
-const OPENWEATHERMAP_APPID = localStorage.getItem('_openWeatherMapAppId');
-
+// const OPENWEATHERMAP_APPID = localStorage.getItem('_openWeatherMapAppId');
 
 function insertSuggestionToTextbox(suggestion) {
   $('.suggestions').remove();
@@ -201,123 +200,135 @@ $('.autocomplete').keyup((e) => {
 
 // #region fetch APIs
 
-function fetchGeoCodingInfoSuccessCallback(result) {
-  let geoCoordinates = {};
+// function fetchGeoCodingInfoSuccessCallback(result) {
+//   let geoCoordinates = {};
 
-  const {
-    Response:
-    {
-      View = 'Oops! No coordinates for this location',
-      // the array which contains geocoordinates
-    },
-  } = result;
+//   const {
+//     Response:
+//     {
+//       View = 'Oops! No coordinates for this location',
+//       // the array which contains geocoordinates
+//     },
+//   } = result;
 
-  View.forEach((view) => {
-    const {
-      Result = 'Oops! No coordinates for this location',
-      // an array containing the geocoordinate
-    } = view;
-    Result.forEach((res) => {
-      const {
-        Location: {
-          NavigationPosition = [],
-          // the geocoordinates object
-        },
-      } = res;
-      geoCoordinates = NavigationPosition;
-      // insert the geocoordinates to the geoCoordinates object
-    });
-  });
-  return geoCoordinates;
-}
+//   View.forEach((view) => {
+//     const {
+//       Result = 'Oops! No coordinates for this location',
+//       // an array containing the geocoordinate
+//     } = view;
+//     Result.forEach((res) => {
+//       const {
+//         Location: {
+//           NavigationPosition = [],
+//           // the geocoordinates object
+//         },
+//       } = res;
+//       geoCoordinates = NavigationPosition;
+//       // insert the geocoordinates to the geoCoordinates object
+//     });
+//   });
+//   return geoCoordinates;
+// }
 
-function getGeoCodingInfoOfSearchedPlace(searchString) {
-  if (!searchString) {
-    return 'Invalid value passed as parameter!';
-  }
+// function getGeoCodingInfoOfSearchedPlace(searchString) {
+//   if (!searchString) {
+//     return 'Invalid value passed as parameter!';
+//   }
 
-  const GEOCODER_URL = 'https://geocoder.api.here.com/6.2/geocode.json';
-  const urlEncodedSearchString = searchString.replace(/ /g, '+');
-  const params = `?app_id=${APPLICATION_ID}&app_code=${APPLICATION_CODE}&searchtext=${urlEncodedSearchString}`;
+//   const GEOCODER_URL = 'https://geocoder.api.here.com/6.2/geocode.json';
+//   const urlEncodedSearchString = searchString.replace(/ /g, '+');
+//   const params = `?app_id=${APPLICATION_ID}&app_code=
+// ${ APPLICATION_CODE }& searchtext=${ urlEncodedSearchString }`;
 
-  return fetch(GEOCODER_URL + params)
-    .then((response) => response.json()) // convert response to json object
-    .then((response) => fetchGeoCodingInfoSuccessCallback(response))
-    .catch((error) => error);
-}
+//   return fetch(GEOCODER_URL + params)
+//     .then((response) => response.json()) // convert response to json object
+//     .then((response) => fetchGeoCodingInfoSuccessCallback(response))
+//     .catch((error) => error);
+// }
 
-function fetchWeatherInfoOfSearchPlaceSuccessCallback(result) {
-  const weatherInfo = {};
-  const {
-    coord = {},
-    weather = [],
-    main = {},
-    wind = {},
-  } = result; // get only weather, main and wind from returned json;
+// function fetchWeatherInfoOfSearchedPlaceSuccessCallback(result) {
+//   const weatherInfo = {};
+//   const {
+//     coord = {},
+//     weather = [],
+//     main = {},
+//     wind = {},
+//   } = result; // get only weather, main and wind from returned json;
 
-  console.log(coord);
-  weatherInfo.geoCoordinates = coord;
+//   weatherInfo.geoCoordinates = coord;
 
-  weather.forEach((obj) => {
-    const {
-      main: currentWeather = 'Main weather not found.',
-      // get only main from obj in the weather array and rename it 'currentWeather'
-    } = obj;
-    weatherInfo.currentWeather = currentWeather; // insert currentWeather into weatherInfo obj
-  });
-  const {
-    humidity = 'Humidity not found.',
-    temp: temperature = 'Temperature not found.',
-  } = main; // select only humidity and temp (renamed 'temperature') from the 'main' object
-  weatherInfo.humidity = humidity;
-  weatherInfo.temperature = temperature;
-  // insert them into the weatherInfo object
+//   weather.forEach((obj) => {
+//     const {
+//       main: currentWeather = 'Main weather not found.',
+//       // get only main from obj in the weather array and rename it 'currentWeather'
+//     } = obj;
+//     weatherInfo.currentWeather = currentWeather; // insert currentWeather into weatherInfo obj
+//   });
+//   const {
+//     humidity = 'Humidity not found.',
+//     temp: temperature = 'Temperature not found.',
+//   } = main; // select only humidity and temp (renamed 'temperature') from the 'main' object
+//   weatherInfo.humidity = humidity;
+//   weatherInfo.temperature = temperature;
+//   // insert them into the weatherInfo object
 
-  const {
-    speed: windSpeed = 'Wind speed not found.',
-  } = wind; // select only speed (renamed windSpeed)from the wind obj
-  weatherInfo.windSpeed = windSpeed; // insert windSpeed into weatherInfo obj
-  return weatherInfo;
-}
+//   const {
+//     speed: windSpeed = 'Wind speed not found.',
+//   } = wind; // select only speed (renamed windSpeed)from the wind obj
+//   weatherInfo.windSpeed = windSpeed; // insert windSpeed into weatherInfo obj
+//   return weatherInfo;
+// }
 
-function getWeatherInfoOfSearchedPlace(lat, lon) {
-  const OPENWEATHERMAP_URL = 'http://api.openweathermap.org/data/2.5/weather';
-  const params = `?lat=${lat}&lon=${lon}&appid=${OPENWEATHERMAP_APPID}`;
-  return fetch(OPENWEATHERMAP_URL + params)
-    .then((response) => response.json()) // convert response to json object
-    .then((result) => fetchWeatherInfoOfSearchPlaceSuccessCallback(result))
-    .catch((error) => error);
-}
+// function getWeatherInfoOfSearchedPlace(lat, lon) {
+//   const OPENWEATHERMAP_URL = 'http://api.openweathermap.org/data/2.5/weather';
+//   const params = `?lat=${lat}&lon=${lon}&appid=${OPENWEATHERMAP_APPID}`;
+//   return fetch(OPENWEATHERMAP_URL + params)
+//     .then((response) => response.json()) // convert response to json object
+//     .then((result) => fetchWeatherInfoOfSearchedPlaceSuccessCallback(result))
+//     .catch((error) => error);
+// }
 
-function getLandmarksAroundSearchedPlace(geoCoordinates) {
-  const { lat, lon } = geoCoordinates;
-  const GEOCODER_LANDMARKS_URL = 'https://reverse.geocoder.api.here.com/6.2/reversegeocode.json';
+// function getLandmarksAroundSearchedPlaceSuccessCallBack(result) {
+//   const { View } = result.Response;
+//   console.log(View);
+// }
 
-  // Mark the end of the match in a token.
-  const params = `?app_id=${APPLICATION_ID}&app_code=${APPLICATION_CODE}& mode=retrieveLandmarks & prox=${lon}, ${lat}, 1000`;
-  console.log(GEOCODER_LANDMARKS_URL + params);
-  return fetch(GEOCODER_LANDMARKS_URL + params)
-    .then((response) => response.json()) // convert response to json object
-    .then((result) => {
-      console.log(result);
-    })
-    .catch((error) => error);
-}
+// function getLandmarksAroundSearchedPlace(geoCoordinates) {
+//   if (!geoCoordinates || geoCoordinates === 0) {
+//     return 0;
+//   }
+//   const {
+//     geoCoordinates: {
+//       lat = '',
+//       lon = '',
+//     },
+//   } = geoCoordinates;
+//   const GEOCODER_LANDMARKS_URL = 'https://reverse.geocoder.api.here.com/6.2/reversegeocode.json';
+
+//   // Mark the end of the match in a token.
+//   const params = `?app_id=${APPLICATION_ID}&app_code=${APPLICATION_CODE}
+//    &mode=retrieveLandmarks & prox=${ lat }, ${ lon }, 1000`;
+//   console.log(GEOCODER_LANDMARKS_URL + params);
+//   return fetch(GEOCODER_LANDMARKS_URL + params)
+//     .then((response) => response.json()) // convert response to json object
+//     .then((result) => getLandmarksAroundSearchedPlaceSuccessCallBack(result))
+//     .catch((error) => error);
+// }
 
 // #endregion
 
 $(document).ready(() => {
   // initMap();
-  const geoCoordinatesPromise = getGeoCodingInfoOfSearchedPlace('Ikorodu Lagos Nigeria');
-  geoCoordinatesPromise.then((params) => {
-    if (!params || !params[0]) {
-      return 0;
-    }
-    const { Latitude, Longitude } = params[0];
-    return getWeatherInfoOfSearchedPlace(Latitude, Longitude);
-  })
-    .then((res) => {
-      console.log(res);
-      return getLandmarksAroundSearchedPlace(geoCoordinates);
-    });
+  // const geoCoordinatesPromise = getGeoCodingInfoOfSearchedPlace('Onitsha Anambra Nigeria');
+  // geoCoordinatesPromise.then((params) => {
+  //   if (!params || !params[0]) {
+  //     return 0;
+  //   }
+  //   const { Latitude, Longitude } = params[0];
+  //   return getWeatherInfoOfSearchedPlace(Latitude, Longitude);
+  // })
+  //   .then((res) => {
+  //     console.log(res);
+  //     return getLandmarksAroundSearchedPlace(res);
+  //   });
 });
