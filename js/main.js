@@ -1,6 +1,6 @@
 const APPLICATION_ID = localStorage.getItem('_appId');
 const APPLICATION_CODE = localStorage.getItem('_appCode');
-// const OPENWEATHERMAP_APPID = localStorage.getItem('_openWeatherMapAppId');
+const OPENWEATHERMAP_APPID = localStorage.getItem('_openWeatherMapAppId');
 
 
 function insertSuggestionToTextbox(suggestion) {
@@ -199,6 +199,8 @@ $('.autocomplete').keyup((e) => {
 
 // #endregion
 
+// #region fetch APIs
+
 function fetchGeoCodingInfoSuccessCallback(result) {
   let geoCoordinates = {};
 
@@ -218,7 +220,7 @@ function fetchGeoCodingInfoSuccessCallback(result) {
     Result.forEach((res) => {
       const {
         Location: {
-          NavigationPosition = 'Oops! No coordinates for this location',
+          NavigationPosition = [],
           // the geocoordinates object
         },
       } = res;
@@ -244,22 +246,44 @@ function getGeoCodingInfoOfSearchedPlace(searchString) {
     .catch((error) => error);
 }
 
-// function getWeatherInfoOfSearchedPlace(geoCoordinates) {
-//   const { lat, lon } = geoCoordinates;
+function fetchWeatherInfoOfSearchPlaceSuccessCallback(result) {
+  const weatherInfo = {};
+  const {
+    weather = [],
+    main = {},
+    wind = {},
+  } = result; // get only weather, main and wind from returned json;
 
-//   const OPENWEATHERMAP_URL = 'http://api.openweathermap.org/data/2.5/weather';
-//   // My application code
-//   // Mark the end of the match in a token.
-//   const params = `?lat=${lat}&lon=${lon}&appid=${OPENWEATHERMAP_APPID}`;
+  weather.forEach((obj) => {
+    const {
+      main: currentWeather = 'Main weather not found.',
+      // get only main from obj in the weather array and rename it 'currentWeather'
+    } = obj;
+    weatherInfo.currentWeather = currentWeather; // insert currentWeather into weatherInfo obj
+  });
+  const {
+    humidity = 'Humidity not found.',
+    temp: temperature = 'Temperature not found.',
+  } = main; // select only humidity and temp (renamed 'temperature') from the 'main' object
+  weatherInfo.humidity = humidity;
+  weatherInfo.temperature = temperature;
+  // insert them into the weatherInfo object
 
-//   return fetch(OPENWEATHERMAP_URL + params)
-//     .then((response) => response.json()) // convert response to json object
-//     .then((result) => {
-//       const { view } = result;
-//       return view;
-//     })
-//     .catch((error) => error);
-// }
+  const {
+    speed: windSpeed = 'Wind speed not found.',
+  } = wind; // select only speed (renamed windSpeed)from the wind obj
+  weatherInfo.windSpeed = windSpeed; // insert windSpeed into weatherInfo obj
+  return weatherInfo;
+}
+
+function getWeatherInfoOfSearchedPlace(lat, lon) {
+  const OPENWEATHERMAP_URL = 'http://api.openweathermap.org/data/2.5/weather';
+  const params = `?lat=${lat}&lon=${lon}&appid=${OPENWEATHERMAP_APPID}`;
+  return fetch(OPENWEATHERMAP_URL + params)
+    .then((response) => response.json()) // convert response to json object
+    .then((result) => fetchWeatherInfoOfSearchPlaceSuccessCallback(result))
+    .catch((error) => error);
+}
 
 // function getLandmarksAroundSearchPlace(geoCoordinates) {
 //   const { lat, lon } = geoCoordinates;
@@ -278,12 +302,21 @@ function getGeoCodingInfoOfSearchedPlace(searchString) {
 //     })
 //     .catch((error) => error);
 // }
+
+// #endregion
+
 $(document).ready(() => {
   // getLandmarksAroundSearchPlace(geoCoordinates);
-  // getWeatherInfoOfSearchedPlace(geoCoordinates);
   // initMap();
-  const geoCoordinates = getGeoCodingInfoOfSearchedPlace('Port-Hacourt Nigeria');
-  geoCoordinates.then((params) => {
-    console.log(params);
-  });
+  const geoCoordinatesPromise = getGeoCodingInfoOfSearchedPlace(' ');
+  geoCoordinatesPromise.then((params) => {
+    if (!params || !params[0]) {
+      return 0;
+    }
+    const { Latitude, Longitude } = params[0];
+    return getWeatherInfoOfSearchedPlace(Latitude, Longitude);
+  })
+    .then((res) => {
+      console.log(res);
+    });
 });
