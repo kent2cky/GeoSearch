@@ -249,10 +249,14 @@ function getGeoCodingInfoOfSearchedPlace(searchString) {
 function fetchWeatherInfoOfSearchPlaceSuccessCallback(result) {
   const weatherInfo = {};
   const {
+    coord = {},
     weather = [],
     main = {},
     wind = {},
   } = result; // get only weather, main and wind from returned json;
+
+  console.log(coord);
+  weatherInfo.geoCoordinates = coord;
 
   weather.forEach((obj) => {
     const {
@@ -285,30 +289,26 @@ function getWeatherInfoOfSearchedPlace(lat, lon) {
     .catch((error) => error);
 }
 
-// function getLandmarksAroundSearchPlace(geoCoordinates) {
-//   const { lat, lon } = geoCoordinates;
-//   const GEOCODER_LANDMARKS_URL = 'https://reverse.geocoder.api.here.com/6.2/reversegeocode.json';
+function getLandmarksAroundSearchedPlace(geoCoordinates) {
+  const { lat, lon } = geoCoordinates;
+  const GEOCODER_LANDMARKS_URL = 'https://reverse.geocoder.api.here.com/6.2/reversegeocode.json';
 
-//   // Mark the end of the match in a token.
-// const params = `?app_id=${APPLICATION_ID}&app_code=${APPLICATION_CODE}
-// & mode=retrieveLandmarks & prox=${ lon }, ${ lat }, 1000`;
-
-
-//   return fetch(GEOCODER_LANDMARKS_URL + params)
-//     .then((response) => response.json()) // convert response to json object
-//     .then((result) => {
-//       const { view } = result;
-//       return view;
-//     })
-//     .catch((error) => error);
-// }
+  // Mark the end of the match in a token.
+  const params = `?app_id=${APPLICATION_ID}&app_code=${APPLICATION_CODE}& mode=retrieveLandmarks & prox=${lon}, ${lat}, 1000`;
+  console.log(GEOCODER_LANDMARKS_URL + params);
+  return fetch(GEOCODER_LANDMARKS_URL + params)
+    .then((response) => response.json()) // convert response to json object
+    .then((result) => {
+      console.log(result);
+    })
+    .catch((error) => error);
+}
 
 // #endregion
 
 $(document).ready(() => {
-  // getLandmarksAroundSearchPlace(geoCoordinates);
   // initMap();
-  const geoCoordinatesPromise = getGeoCodingInfoOfSearchedPlace(' ');
+  const geoCoordinatesPromise = getGeoCodingInfoOfSearchedPlace('Ikorodu Lagos Nigeria');
   geoCoordinatesPromise.then((params) => {
     if (!params || !params[0]) {
       return 0;
@@ -318,5 +318,6 @@ $(document).ready(() => {
   })
     .then((res) => {
       console.log(res);
+      return getLandmarksAroundSearchedPlace(geoCoordinates);
     });
 });
