@@ -1,5 +1,4 @@
 <!doctype html>
-
 <html>
 
 <head>
@@ -11,10 +10,21 @@
     <meta name="author" content="kent2ckymaduka@gmail.com">
     <link rel="stylesheet" href="main.css" type="text/css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:url" content="https://quiet-rabbit-56.localtunnel.me/index.html" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="GeoSearch" />
+    <meta property="og:description" content="Search for any place of interest." />
+    <meta property="og:image" content="https://quiet-rabbit-56.localtunnel.me/minImages/1084-536x354-grayscale.jpg" />
+    <meta property="og:image:width" content="300" />
+    <meta property="og:image:height" content="100" />
+    <meta property="fb:app-id" content="378043272850469" />
 </head>
 
 <body>
-
+    <div id="fb-root"></div>
+    <script async defer crossorigin="anonymous"
+        src="https://connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v5.0&appId=378043272850469&autoLogAppEvents=1">
+        </script>
     <header>
         <nav class="nav-container">
             <h1>GeoSearch</h1>
@@ -34,12 +44,10 @@
                     <li id="getInspired">
                         <span><a id="search" href="#search-section">Search</a></span>
                     </li>
-
                 </ul>
             </div>
         </nav>
     </header>
-
     <main>
         <div class="welcome-image">
             <!-- <img src="minImages/870-536x354-blur_2-grayscale.jpg" alt="image from unsplash"> -->
@@ -55,7 +63,6 @@
                 <button id="submit-button">Search</button>
             </form>
         </section>
-
         <section id="search-results" style="display: block">
             <div class="about-place">
                 <h3>Onitsha</h3>
@@ -77,8 +84,6 @@
                 </div>
 
                 <h3 class="place-info">Place information</h3>
-
-
                 <table class="place-info">
                     <tr>
                         <td>Humidity</td>
@@ -110,20 +115,19 @@
                         <td id="postal-code">430235</td>
                     </tr>
                 </table>
-
             </div>
 
+            <div class="fb-share-button" data-href="https://quiet-rabbit-56.localtunnel.me" data-layout="button_count"
+                data-size="small">
+                <a target="_blank" href="https://quiet-rabbit-56.localtunnel.me" class="fb-xfbml-parse-ignore">Share</a>
+            </div>
             <div class="share">
-                <button id="fb-share">
+                <button id="fb-share-button">
                     Share to facebook
                 </button>
             </div>
-
         </section>
-
     </main>
-
-
     <footer>
         Email: <a href="mailto:kent2ckymaduka@gmail.com">kent2ckymaduka@gmail.com</a><br>
         Mobile: <a href="tel:+2347062685682">(+234)07062685682</a><br>
@@ -131,10 +135,9 @@
     </footer>
     <script async defer
         src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBNYcmllOQLnpkLyxHN99e74U1ZT3Gz4iI&callback=initMap">
-    </script>
+        </script>
     <script src="jquery-3.4.1.min.js" type="text/javascript"></script>
     <script src="main.js" type="text/javascript"></script>
-
 </body>
 
 </html>
