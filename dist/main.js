@@ -9,6 +9,53 @@ function insertSuggestionToTextbox(suggestion) {
 }
 
 function createAndAppendAutoCompleteElements(suggestions) {
+  // early exit function validation
+  if (!suggestions) {
+    $('suggestions').remove();
+    return;
+  }
+
+  $('.suggestions').remove();
+  let id = 0;
+  const result = suggestions.map((suggestion) => {
+    id += 1;
+    return `<div class="suggestions" id=${id} countrycode=${suggestion.countryCode} tabindex="0"> ${suggestion.label} </div>`;
+  });
+  $('form').append(result);
+}
+
+class TemperatureConverter {
+  constructor(temperature = 'no null parameter', metricSystem = 'celsius') {
+    this.temperature = temperature;
+    this.metricSystem = metricSystem;
+  }
+
+  convertToCelsius(temperature) {
+    this.celsTemp = (temperature - 32) * (5 / 9);
+    return Math.ceil(this.celsTemp * 100) / 100;
+  }
+
+  convertToFahrenheit(temperature) {
+    this.fahrTemp = temperature * (9 / 5) + 32;
+    return Math.ceil(this.fahrTemp * 100) / 100;
+  }
+
+  getCurrentMetricSystem() {
+    return this.metricSystem;
+  }
+
+  setCurrentMetricSystem(system) {
+    this.metricSystem = system;
+  }
+}
+
+function insertSuggestionToTextbox(suggestion) {
+  $('.suggestions').remove();
+  $('input').val(suggestion);
+  $('input').focus();
+}
+
+function createAndAppendAutoCompleteElements(suggestions) {
   $('.suggestions').remove();
   let id = 0;
   const result = suggestions.map((suggestion) => {
@@ -17,7 +64,6 @@ function createAndAppendAutoCompleteElements(suggestions) {
   });
   $('form').append(result);
 }
-
 
 // this handles the navigation toggle functionality.
 $('.nav_handle-container').click(() => {
