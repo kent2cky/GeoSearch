@@ -176,65 +176,65 @@ $('.autocomplete').keyup((e) => {
 // #region map
 
 // Initialize and add the map
-// function initMap() {
-//   // The location of Uluru
-//   const uluru = {
-//     lat: 9.08,
-//     lng: 6.02,
-//   };
+function initMap() {
+  // The location of Uluru
+  const uluru = {
+    lat: 9.08,
+    lng: 6.02,
+  };
 
-//   const onitsha = {
-//     lat: 6.15,
-//     lng: 6.79,
-//   };
-//   const abuja = {
-//     lat: 9.06,
-//     lng: 7.49,
-//   };
+  const onitsha = {
+    lat: 6.15,
+    lng: 6.79,
+  };
+  const abuja = {
+    lat: 9.06,
+    lng: 7.49,
+  };
 
-//   const icons = {
-//     center: {
-//       icon: 'minImages/flag-red.png',
-//     },
-//     landmarks: {
-//       icon: 'minImages/flag-blue.png',
-//     },
-//   };
-//   // The map, centered at Uluru
-//   const map = new google.maps.Map(document.getElementById('map'), {
-//     zoom: 5,
-//     center: uluru,
-//   });
-//   // The marker, positioned at Uluru
-//   const centerMarker = new google.maps.Marker({
-//     position: uluru,
-//     animation: google.maps.Animation.BOUNCE,
-//     icon: icons.center.icon,
-//     map,
-//   });
+  const icons = {
+    center: {
+      icon: 'minImages/flag-red.png',
+    },
+    landmarks: {
+      icon: 'minImages/flag-blue.png',
+    },
+  };
+  // The map, centered at Uluru
+  const map = new google.maps.Map(document.getElementById('map'), {
+    zoom: 5,
+    center: uluru,
+  });
+  // The marker, positioned at Uluru
+  const centerMarker = new google.maps.Marker({
+    position: uluru,
+    animation: google.maps.Animation.BOUNCE,
+    icon: icons.center.icon,
+    map,
+  });
 
-//   const landmark = new google.maps.Marker({
-//     position: onitsha,
-//     animation: google.maps.Animation.DROP,
-//     icon: icons.landmarks.icon,
-//     map,
-//   });
+  const landmark = new google.maps.Marker({
+    position: onitsha,
+    animation: google.maps.Animation.DROP,
+    icon: icons.landmarks.icon,
+    map,
+  });
 
-//   const anotherLandmark = new google.maps.Marker({
-//     position: abuja,
-//     animation: google.maps.Animation.DROP,
-//     icon: icons.landmarks.icon,
-//     map,
-//   });
+  const anotherLandmark = new google.maps.Marker({
+    position: abuja,
+    animation: google.maps.Animation.DROP,
+    icon: icons.landmarks.icon,
+    map,
+  });
 
-//   google.maps.event.addListener(landmark, 'click', () => {
-//   });
-//   google.maps.event.addListener(anotherLandmark, 'click', () => {
-//   });
+  google.maps.event.addListener(landmark, 'click', () => {
+  });
+  google.maps.event.addListener(anotherLandmark, 'click', () => {
+  });
 
-//   google.maps.event.addListener(centerMarker, 'click', () => {
-//   });
-// }
+  google.maps.event.addListener(centerMarker, 'click', () => {
+  });
+}
 
 // #endregion
 
