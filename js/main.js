@@ -49,22 +49,6 @@ class TemperatureConverter {
   }
 }
 
-function insertSuggestionToTextbox(suggestion) {
-  $('.suggestions').remove();
-  $('input').val(suggestion);
-  $('input').focus();
-}
-
-function createAndAppendAutoCompleteElements(suggestions) {
-  $('.suggestions').remove();
-  let id = 0;
-  const result = suggestions.map((suggestion) => {
-    id += 1;
-    return `<div class="suggestions" id=${id} tabindex="0"> ${suggestion.label} </div>`;
-  });
-  $('form').append(result);
-}
-
 // this handles the navigation toggle functionality.
 $('.nav_handle-container').click(() => {
   if ($('.toggled').is(':visible')) {
@@ -173,71 +157,6 @@ $('.autocomplete').keyup((e) => {
 
 // #endregion
 
-// #region map
-
-// Initialize and add the map
-function initMap() {
-  // The location of Uluru
-  const uluru = {
-    lat: 9.08,
-    lng: 6.02,
-  };
-
-  const onitsha = {
-    lat: 6.15,
-    lng: 6.79,
-  };
-  const abuja = {
-    lat: 9.06,
-    lng: 7.49,
-  };
-
-  const icons = {
-    center: {
-      icon: 'minImages/flag-red.png',
-    },
-    landmarks: {
-      icon: 'minImages/flag-blue.png',
-    },
-  };
-  // The map, centered at Uluru
-  const map = new google.maps.Map(document.getElementById('map'), {
-    zoom: 5,
-    center: uluru,
-  });
-  // The marker, positioned at Uluru
-  const centerMarker = new google.maps.Marker({
-    position: uluru,
-    animation: google.maps.Animation.BOUNCE,
-    icon: icons.center.icon,
-    map,
-  });
-
-  const landmark = new google.maps.Marker({
-    position: onitsha,
-    animation: google.maps.Animation.DROP,
-    icon: icons.landmarks.icon,
-    map,
-  });
-
-  const anotherLandmark = new google.maps.Marker({
-    position: abuja,
-    animation: google.maps.Animation.DROP,
-    icon: icons.landmarks.icon,
-    map,
-  });
-
-  google.maps.event.addListener(landmark, 'click', () => {
-  });
-  google.maps.event.addListener(anotherLandmark, 'click', () => {
-  });
-
-  google.maps.event.addListener(centerMarker, 'click', () => {
-  });
-}
-
-// #endregion
-
 // #region fetch APIs
 
 function fetchGeoCodingInfoSuccessCallback(result) {
@@ -270,7 +189,7 @@ function getGeoCodingInfoOfSearchedPlace(searchString) {
   }
 
   const GEOCODER_URL = 'https://geocoder.api.here.com/6.2/geocode.json';
-  const urlEncodedSearchString = searchString.replace(/ /g, '+');
+  const urlEncodedSearchString = encodeURIComponent(searchString);
   const params = `?app_id=${APPLICATION_ID}&app_code=${APPLICATION_CODE}&searchtext=${urlEncodedSearchString}`;
   return fetch(GEOCODER_URL + params)
     .then((response) => response.json()) // convert response to json object
@@ -326,10 +245,10 @@ function getLandmarksAroundSearchedPlaceSuccessCallBack(result) {
   if (!result || result.type === 'ApplicationError') {
     throw new Error(`Error fetching geocoding information: ${result.type} `);
   }
-  const landmark = {};
   const landmarks = [];
   const { Result } = result.Response.View[0];
   Result.forEach((obj) => {
+    const landmark = {};
     const {
       Location: {
         LocationType = 'Nothing here.',
@@ -354,7 +273,6 @@ function getLandmarksAroundSearchedPlaceSuccessCallBack(result) {
 
     landmarks.push(landmark);
   });
-
   return landmarks;
 }
 
@@ -377,14 +295,98 @@ function getLandmarksAroundSearchedPlace(geoCoordinates) {
 
 // #endregion
 
+// #region map
+
+function callback(result, status) {
+  console.log(result, status);
+}
+
+// Initialize and add the map
+function initMap(results) {
+  console.log('This is results:  ', results);
+  // The location of Uluru
+  const uluru = {
+    lat: 9.08,
+    lng: 6.02,
+  };
+
+  const onitsha = {
+    lat: 6.15,
+    lng: 6.79,
+  };
+  const abuja = {
+    lat: 9.06,
+    lng: 7.49,
+  };
+
+  const icons = {
+    center: {
+      icon: 'minImages/flag-red.png',
+    },
+    landmarks: {
+      icon: 'minImages/flag-blue.png',
+    },
+  };
+  // The map, centered at Uluru
+  const map = new google.maps.Map(document.getElementById('map'), {
+    zoom: 5,
+    center: uluru,
+  });
+
+  // const service = new google.maps.places.PlacesService(map);
+
+  // service.findPlaceFromQuery(request, callback);
+
+  // The marker, positioned at Uluru
+  const centerMarker = new google.maps.Marker({
+    position: uluru,
+    animation: google.maps.Animation.BOUNCE,
+    icon: icons.center.icon,
+    map,
+  });
+
+  const landmark = new google.maps.Marker({
+    position: onitsha,
+    animation: google.maps.Animation.DROP,
+    icon: icons.landmarks.icon,
+    map,
+  });
+
+  const anotherLandmark = new google.maps.Marker({
+    position: abuja,
+    animation: google.maps.Animation.DROP,
+    icon: icons.landmarks.icon,
+    map,
+  });
+
+  google.maps.event.addListener(landmark, 'click', () => {
+  });
+  google.maps.event.addListener(anotherLandmark, 'click', () => {
+  });
+
+  google.maps.event.addListener(centerMarker, 'click', () => {
+  });
+  results.forEach((result) => {
+    console.log('This is from fromEach', result.name);
+    const request = {
+      query: result.name,
+      fields: ['name', 'photos'],
+    };
+  });
+}
+
+// #endregion map
+
 $(document).ready(() => {
-  // initMap();
-  const geoCoordinatesPromise = getGeoCodingInfoOfSearchedPlace(' Nigeria,     Lagos    ,     Lagos    ,     Mile     12 Brg ');
+  const geoCoordinatesPromise = getGeoCodingInfoOfSearchedPlace('London');
   geoCoordinatesPromise.then((params) => {
     const { Latitude, Longitude } = params;
     return getWeatherInfoOfSearchedPlace(Latitude, Longitude);
   })
     .then((res) => getLandmarksAroundSearchedPlace(res.geoCoordinates))
-    .then((result) => console.log(result))
+    .then((result) => {
+      console.log('this is from main: ', result);
+      initMap(result);
+    })
     .catch((Error) => console.log(`This is from catch: ${Error} `));
 });
