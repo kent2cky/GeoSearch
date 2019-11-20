@@ -233,6 +233,9 @@ function fetchWeatherInfoOfSearchedPlaceSuccessCallback(result) {
 }
 
 function getWeatherInfoOfSearchedPlace(lat, lon) {
+  if (!lat || !lon) {
+    throw new Error('Error fetching weather information.');
+  }
   const OPENWEATHERMAP_URL = 'http://api.openweathermap.org/data/2.5/weather';
   const params = `?lat=${lat}&lon=${lon}&appid=${OPENWEATHERMAP_APPID}`;
   return fetch(OPENWEATHERMAP_URL + params)
@@ -241,8 +244,8 @@ function getWeatherInfoOfSearchedPlace(lat, lon) {
     .catch((error) => error);
 }
 
-function getLandmarksAroundSearchedPlaceSuccessCallBack(result) {
-  if (!result || result.type === 'ApplicationError') {
+function getLandmarksAroundSearchedPlaceSuccessCallBack(result, geoCoord) {
+  if ((!result || result.type === 'ApplicationError') || !geoCoord) {
     throw new Error(`Error fetching geocoding information: ${result.type} `);
   }
   const landmarks = [];
@@ -273,7 +276,10 @@ function getLandmarksAroundSearchedPlaceSuccessCallBack(result) {
 
     landmarks.push(landmark);
   });
-  return landmarks;
+  return {
+    Landmarks: landmarks,
+    mainGeoCoord: geoCoord,
+  };
 }
 
 function getLandmarksAroundSearchedPlace(geoCoordinates) {
@@ -289,7 +295,7 @@ function getLandmarksAroundSearchedPlace(geoCoordinates) {
   const params = `?app_id=${APPLICATION_ID}&app_code=${APPLICATION_CODE}&mode=retrieveLandmarks&prox=${lat},${lon},1000`;
   return fetch(GEOCODER_LANDMARKS_URL + params)
     .then((response) => response.json()) // convert response to json object
-    .then((result) => getLandmarksAroundSearchedPlaceSuccessCallBack(result))
+    .then((result) => getLandmarksAroundSearchedPlaceSuccessCallBack(result, geoCoordinates))
     .catch((error) => error);
 }
 
@@ -297,96 +303,75 @@ function getLandmarksAroundSearchedPlace(geoCoordinates) {
 
 // #region map
 
-function callback(result, status) {
-  console.log(result, status);
-}
+// function callback(result, status) {
+//   console.log(result, status);
+// }
 
 // Initialize and add the map
 function initMap(results) {
-  console.log('This is results:  ', results);
-  // The location of Uluru
-  const uluru = {
-    lat: 9.08,
-    lng: 6.02,
-  };
-
-  const onitsha = {
-    lat: 6.15,
-    lng: 6.79,
-  };
-  const abuja = {
-    lat: 9.06,
-    lng: 7.49,
-  };
+  console.log(results);
+  const { Landmarks, mainGeoCoord } = results;
 
   const icons = {
-    center: {
-      icon: 'minImages/flag-red.png',
-    },
-    landmarks: {
-      icon: 'minImages/flag-blue.png',
-    },
+    centerIcon: 'minImages/flag-red.png',
+    landmarkIcon: 'minImages/flag-blue.png',
   };
-  // The map, centered at Uluru
+
+  const center = {
+    lat: mainGeoCoord.lat,
+    lng: mainGeoCoord.lon,
+  };
+
+  // The map, centered at mainCoordinate
+  // mainCoordinate is the location the user searched for
   const map = new google.maps.Map(document.getElementById('map'), {
-    zoom: 5,
-    center: uluru,
+    zoom: 11,
+    center,
   });
-
-  // const service = new google.maps.places.PlacesService(map);
-
-  // service.findPlaceFromQuery(request, callback);
-
-  // The marker, positioned at Uluru
+  // The marker, positioned at center
   const centerMarker = new google.maps.Marker({
-    position: uluru,
+    position: center,
     animation: google.maps.Animation.BOUNCE,
-    icon: icons.center.icon,
+    icon: icons.centerIcon,
     map,
-  });
-
-  const landmark = new google.maps.Marker({
-    position: onitsha,
-    animation: google.maps.Animation.DROP,
-    icon: icons.landmarks.icon,
-    map,
-  });
-
-  const anotherLandmark = new google.maps.Marker({
-    position: abuja,
-    animation: google.maps.Animation.DROP,
-    icon: icons.landmarks.icon,
-    map,
-  });
-
-  google.maps.event.addListener(landmark, 'click', () => {
-  });
-  google.maps.event.addListener(anotherLandmark, 'click', () => {
   });
 
   google.maps.event.addListener(centerMarker, 'click', () => {
+    console.log('marker clicked');
   });
-  results.forEach((result) => {
-    console.log('This is from fromEach', result.name);
-    const request = {
-      query: result.name,
-      fields: ['name', 'photos'],
-    };
+
+  Landmarks.forEach((result) => {
+    const { Latitude, Longitude } = result.displayPosition;
+
+    const marker = new google.maps.Marker({
+      position: {
+        lat: Latitude,
+        lng: Longitude,
+      },
+      animation: google.maps.Animation.DROP,
+      icon: icons.landmarkIcon,
+      map,
+    });
+    // Add a click event to each marker.
+    ((param, object) => {
+      google.maps.event.addListener(param, 'click', () => {
+        console.log(`marker clicked ${object}`);
+      });
+    })(marker, results.label);
   });
+  // const service = new google.maps.places.PlacesService(map);
+  // service.findPlaceFromQuery(request, callback);
 }
 
 // #endregion map
 
 $(document).ready(() => {
-  const geoCoordinatesPromise = getGeoCodingInfoOfSearchedPlace('London');
+  const geoCoordinatesPromise = getGeoCodingInfoOfSearchedPlace('when now and then then');
   geoCoordinatesPromise.then((params) => {
     const { Latitude, Longitude } = params;
     return getWeatherInfoOfSearchedPlace(Latitude, Longitude);
   })
     .then((res) => getLandmarksAroundSearchedPlace(res.geoCoordinates))
-    .then((result) => {
-      console.log('this is from main: ', result);
-      initMap(result);
-    })
+    .then((result) => initMap(result))
     .catch((Error) => console.log(`This is from catch: ${Error} `));
 });
