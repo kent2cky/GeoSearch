@@ -303,10 +303,6 @@ function getLandmarksAroundSearchedPlace(geoCoordinates) {
 
 // #region map
 
-// function callback(result, status) {
-//   console.log(result, status);
-// }
-
 // Initialize and add the map
 function initMap(results) {
   console.log(results);
@@ -342,6 +338,7 @@ function initMap(results) {
 
   Landmarks.forEach((result) => {
     const { Latitude, Longitude } = result.displayPosition;
+    const { name: placeName } = result;
 
     const marker = new google.maps.Marker({
       position: {
@@ -352,21 +349,49 @@ function initMap(results) {
       icon: icons.landmarkIcon,
       map,
     });
-    // Add a click event to each marker.
-    ((param, object) => {
-      google.maps.event.addListener(param, 'click', () => {
-        console.log(`marker clicked ${object}`);
-      });
-    })(marker, results.label);
-  });
-  // const service = new google.maps.places.PlacesService(map);
-  // service.findPlaceFromQuery(request, callback);
-}
 
+    // Add a click event to each marker.
+    ((param, placeName) => {
+      function findPlaceFromQueryCallback(response, status) {
+        $('#landmark-photo').remove(); // remove already displayed image
+        if (status !== 'OK') {
+          $('#search-results').append('<div id="landmark-photo"><span> No photo here!</span></div>');
+          // if there is no photo
+          return;
+        }
+        try {
+          console.log(response, status);
+          const { photos = 'No Photos', name = 'No name' } = response[0];
+          const htmlPhotos = photos.map((photo) => {
+            console.log(photo, name);
+            const photoUrl = photo.getUrl();
+            return `<div id="landmark-photo">
+          <span>${name}</span>
+          <img src="${photoUrl}" alt="${name}" height="${300}" width="${333}">
+           </div>`;
+          });
+          console.log(htmlPhotos);
+          $('#search-results').append(htmlPhotos);
+        } catch (error) {
+          $('#search-results').append('<div id="landmark-photo"><span>No photo here!</span></div>');
+          // if there is no photo 
+        }
+      }
+      const request = {
+        query: `${placeName}`,
+        fields: ['name', 'photos'],
+      };
+      google.maps.event.addListener(param, 'click', () => {
+        const service = new google.maps.places.PlacesService(map);
+        service.findPlaceFromQuery(request, findPlaceFromQueryCallback);
+      });
+    })(marker, placeName);
+  });
+}
 // #endregion map
 
 $(document).ready(() => {
-  const geoCoordinatesPromise = getGeoCodingInfoOfSearchedPlace('when now and then then');
+  const geoCoordinatesPromise = getGeoCodingInfoOfSearchedPlace('Oman,     Ash     Sharqiyah South');
   geoCoordinatesPromise.then((params) => {
     const { Latitude, Longitude } = params;
     return getWeatherInfoOfSearchedPlace(Latitude, Longitude);
