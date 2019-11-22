@@ -24,30 +24,58 @@ function createAndAppendAutoCompleteElements(suggestions) {
   $('form').append(result);
 }
 
+// #region temperature converter
 class TemperatureConverter {
-  constructor(temperature = 'no null parameter', metricSystem = 'celsius') {
-    this.temperature = temperature;
-    this.metricSystem = metricSystem;
-  }
-
   convertToCelsius(temperature) {
     this.celsTemp = (temperature - 32) * (5 / 9);
     return Math.ceil(this.celsTemp * 100) / 100;
+    // multiply then divide by 100 to make the figure rounded to 2 decimal places. Note: this is error prone
   }
 
   convertToFahrenheit(temperature) {
     this.fahrTemp = temperature * (9 / 5) + 32;
     return Math.ceil(this.fahrTemp * 100) / 100;
+    // multiply then divide by 100 to make the figure rounded to 2 decimal places. Note: this is error prone
   }
 
-  getCurrentMetricSystem() {
-    return this.metricSystem;
+  static getCurrentMetricSystem() {
+    return localStorage.getItem('_currMetricSystem');
   }
 
-  setCurrentMetricSystem(system) {
-    this.metricSystem = system;
+  static setCurrentMetricSystem(system) {
+    localStorage.setItem('_currMetricSystem', system);
   }
 }
+
+// function to convert temperature between metric systems (celsius and fahrenheit)
+function convert(metricSystem) {
+  const value = $('#temperature').text(); // grab value to convert
+  TemperatureConverter.setCurrentMetricSystem(metricSystem);
+  // set currentMetricSystem to local storage.
+  const tempConverter = new TemperatureConverter(); // create new instance of the class
+  let newTemp;
+  if (metricSystem === 'celsius') {
+    console.log('celsius');
+    $('input[name=fahrenheit]').prop('checked', false);
+    $('input[name="celsius"]').prop('checked', true);
+    newTemp = tempConverter.convertToCelsius(value);
+  } else { // must be fahrenheit
+    console.log('fahrenheit');
+    $('input[name="celsius"]').prop('checked', false);
+    $('input[name="fahrenheit"]').prop('checked', true);
+    newTemp = tempConverter.convertToFahrenheit(value);
+  }
+  $('#temperature').text(newTemp); // set converted value to element;
+}
+
+$(document).on('click', '#celsius-button', () => {
+  convert('celsius');
+});
+
+$(document).on('click', '#fahrenheit-button', () => {
+  convert('fahrenheit');
+});
+// #endregion temperature converter
 
 // this handles the navigation toggle functionality.
 $('.nav_handle-container').click(() => {
@@ -237,7 +265,8 @@ function getWeatherInfoOfSearchedPlace(lat, lon) {
     throw new Error('Error fetching weather information.');
   }
   const OPENWEATHERMAP_URL = 'http://api.openweathermap.org/data/2.5/weather';
-  const params = `?lat=${lat}&lon=${lon}&appid=${OPENWEATHERMAP_APPID}`;
+  const params = `?lat=${lat}&lon=${lon}&appid=${OPENWEATHERMAP_APPID}&units=metric`;
+  console.log(OPENWEATHERMAP_URL + params);
   return fetch(OPENWEATHERMAP_URL + params)
     .then((response) => response.json()) // convert response to json object
     .then((result) => fetchWeatherInfoOfSearchedPlaceSuccessCallback(result))
@@ -305,7 +334,6 @@ function getLandmarksAroundSearchedPlace(geoCoordinates) {
 
 // Initialize and add the map
 function initMap(results) {
-  console.log(results);
   const { Landmarks, mainGeoCoord } = results;
 
   const icons = {
@@ -360,21 +388,18 @@ function initMap(results) {
           return;
         }
         try {
-          console.log(response, status);
           const { photos = 'No Photos', name = 'No name' } = response[0];
           const htmlPhotos = photos.map((photo) => {
-            console.log(photo, name);
             const photoUrl = photo.getUrl();
             return `<div id="landmark-photo">
           <span>${name}</span>
           <img src="${photoUrl}" alt="${name}" height="${300}" width="${333}">
            </div>`;
           });
-          console.log(htmlPhotos);
           $('#search-results').append(htmlPhotos);
         } catch (error) {
           $('#search-results').append('<div id="landmark-photo"><span>No photo here!</span></div>');
-          // if there is no photo 
+          // if there is no photo
         }
       }
       const request = {
@@ -391,12 +416,29 @@ function initMap(results) {
 // #endregion map
 
 $(document).ready(() => {
-  const geoCoordinatesPromise = getGeoCodingInfoOfSearchedPlace('Oman,     Ash     Sharqiyah South');
+  const geoCoordinatesPromise = getGeoCodingInfoOfSearchedPlace(' Nigeria,     Lagos    ,     Lagos     Island,     Lagos     ');
   geoCoordinatesPromise.then((params) => {
     const { Latitude, Longitude } = params;
     return getWeatherInfoOfSearchedPlace(Latitude, Longitude);
   })
-    .then((res) => getLandmarksAroundSearchedPlace(res.geoCoordinates))
+    .then((res) => {
+      console.log(res);
+      const currentMetricSystem = TemperatureConverter.getCurrentMetricSystem();
+      // retrieve previously set metric system from local storage
+      const {
+        humidity = 'Nothing here',
+        geoCoordinates = 'Nothing here',
+        temperature = 'Nothing here',
+        windSpeed = 'Nothing here',
+        currentWeather = 'Nothing here',
+      } = res;
+      $('#humidity').append(humidity);
+      $('#weather').append(currentWeather);
+      $('#temperature').append(temperature);
+      $('#windspeed').append(windSpeed);
+      $(`input[name=${currentMetricSystem}`).attr('checked', 'checked');
+      return getLandmarksAroundSearchedPlace(geoCoordinates);
+    })
     .then((result) => initMap(result))
     .catch((Error) => console.log(`This is from catch: ${Error} `));
 });

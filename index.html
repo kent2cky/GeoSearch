@@ -90,32 +90,32 @@
                 <table class="place-info">
                     <tr>
                         <td>Humidity</td>
-                        <td id="humidity">Not so humid</td>
+                        <td id="humidity"></td>
                     </tr>
                     <tr>
                         <td>Weather</td>
-                        <td id="weather">Winter</td>
+                        <td id="weather"></td>
                     </tr>
 
                     <tr>
                         <td>Windspeed</td>
-                        <td id="windspeed">12mph</td>
+                        <td id="windspeed"></td>
                     </tr>
 
                     <tr>
                         <td>Temperature</td>
-                        <td id="temperature">Hot</td>
+                        <td id="temperature"></td>
                         <td>
-                            <select name="convert" size="1" id="convert">
-                                <option value="Celsius">Celcius</option>
-                                <option value="Fahrenheit">Fahrenheit</option>
-                            </select>
+                            <div>
+                                <input type="radio" name="celsius" id="celsius-button" class="radio-button" />
+                                <label for="celsius-button" class="radio-button-click-target">
+                                    Celsius
+                                </label>
+                                <input type="radio" name="fahrenheit" id="fahrenheit-button" class="radio-button" />
+                                <label for="fahrenheit-button" class="radio-button-click-target">
+                                    Fahrenheit
+                                </label>
                         </td>
-                    </tr>
-
-                    <tr>
-                        <td>Postal code</td>
-                        <td id="postal-code">430235</td>
                     </tr>
                 </table>
             </div>
