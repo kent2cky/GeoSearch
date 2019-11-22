@@ -61,14 +61,15 @@
         </div>
         <section id="search-section">
             <p>Search for those places that interest you.</p>
-            <form action="submit">
-                <input type="text" class="autocomplete" autofocus>
+            <form action="submit" autocomplete="off">
+                <input type="text" id="mainInput" class="autocomplete" autofocus>
+                <div id='autocomplete'></div>
                 <button id="submit-button">Search</button>
             </form>
         </section>
         <section id="search-results" style="display: block">
             <div class="about-place">
-                <h3>Onitsha</h3>
+                <h3 id="name-of-place"></h3>
                 <div class="image-primary">
                     <!--The div element for the map -->
                     <div id="map"></div>
@@ -90,21 +91,21 @@
                 <table class="place-info">
                     <tr>
                         <td>Humidity</td>
-                        <td id="humidity"></td>
+                        <td ><span id="humidity"></span></td>
                     </tr>
                     <tr>
                         <td>Weather</td>
-                        <td id="weather"></td>
+                        <td ><span id="weather"></span></td>
                     </tr>
 
                     <tr>
                         <td>Windspeed</td>
-                        <td id="windspeed"></td>
+                        <td><span id="windspeed"></span></td>
                     </tr>
 
                     <tr>
                         <td>Temperature</td>
-                        <td id="temperature"></td>
+                        <td><span id="temperature"></span><span>&deg;</span></td>
                         <td>
                             <div>
                                 <input type="radio" name="celsius" id="celsius-button" class="radio-button" />

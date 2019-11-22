@@ -4,38 +4,37 @@ const OPENWEATHERMAP_APPID = localStorage.getItem('_openWeatherMapAppId');
 
 function insertSuggestionToTextbox(suggestion) {
   $('.suggestions').remove();
-  $('input').val(suggestion);
-  $('input').focus();
+  $('#mainInput').val(suggestion);
+  $('#mainInput').focus();
 }
 
 function createAndAppendAutoCompleteElements(suggestions) {
-  // early exit function validation
+  $('.suggestions').remove(); // Remove displayed suggestions
+  // early exit input validation
   if (!suggestions) {
     $('suggestions').remove();
     return;
   }
-
-  $('.suggestions').remove();
   let id = 0;
   const result = suggestions.map((suggestion) => {
     id += 1;
     return `<div class="suggestions" id=${id} countrycode=${suggestion.countryCode} tabindex="0"> ${suggestion.label} </div>`;
   });
-  $('form').append(result);
+  $('#autocomplete').append(result);
 }
 
 // #region temperature converter
 class TemperatureConverter {
   convertToCelsius(temperature) {
     this.celsTemp = (temperature - 32) * (5 / 9);
-    return Math.ceil(this.celsTemp * 100) / 100;
-    // multiply then divide by 100 to make the figure rounded to 2 decimal places. Note: this is error prone
+    return Math.round(this.celsTemp);
+    // Rounding results to integer since decimals have precision problems
   }
 
   convertToFahrenheit(temperature) {
     this.fahrTemp = temperature * (9 / 5) + 32;
-    return Math.ceil(this.fahrTemp * 100) / 100;
-    // multiply then divide by 100 to make the figure rounded to 2 decimal places. Note: this is error prone
+    return Math.round(this.fahrTemp);
+    // Rounding results to integer since decimals have precision problems
   }
 
   static getCurrentMetricSystem() {
@@ -43,24 +42,29 @@ class TemperatureConverter {
   }
 
   static setCurrentMetricSystem(system) {
-    localStorage.setItem('_currMetricSystem', system);
+    try {
+      localStorage.setItem('_currMetricSystem', system);
+    } catch (error) {
+      console.log('error saving metric system to local storage.');
+    }
   }
 }
 
 // function to convert temperature between metric systems (celsius and fahrenheit)
 function convert(metricSystem) {
+  if (TemperatureConverter.getCurrentMetricSystem() === metricSystem) {
+    return; // Prevent from clicking same button more than once;
+  }
   const value = $('#temperature').text(); // grab value to convert
   TemperatureConverter.setCurrentMetricSystem(metricSystem);
   // set currentMetricSystem to local storage.
   const tempConverter = new TemperatureConverter(); // create new instance of the class
   let newTemp;
   if (metricSystem === 'celsius') {
-    console.log('celsius');
     $('input[name=fahrenheit]').prop('checked', false);
     $('input[name="celsius"]').prop('checked', true);
     newTemp = tempConverter.convertToCelsius(value);
   } else { // must be fahrenheit
-    console.log('fahrenheit');
     $('input[name="celsius"]').prop('checked', false);
     $('input[name="fahrenheit"]').prop('checked', true);
     newTemp = tempConverter.convertToFahrenheit(value);
@@ -196,7 +200,6 @@ function fetchGeoCodingInfoSuccessCallback(result) {
     Result = 'Oops! No coordinates for this location',
     // the array which contains geocoordinates
   } = result.Response.View[0];
-
   Result.forEach((res) => {
     const {
       Latitude = 'Oops! No coordinates for this location',
@@ -266,7 +269,6 @@ function getWeatherInfoOfSearchedPlace(lat, lon) {
   }
   const OPENWEATHERMAP_URL = 'http://api.openweathermap.org/data/2.5/weather';
   const params = `?lat=${lat}&lon=${lon}&appid=${OPENWEATHERMAP_APPID}&units=metric`;
-  console.log(OPENWEATHERMAP_URL + params);
   return fetch(OPENWEATHERMAP_URL + params)
     .then((response) => response.json()) // convert response to json object
     .then((result) => fetchWeatherInfoOfSearchedPlaceSuccessCallback(result))
@@ -361,7 +363,6 @@ function initMap(results) {
   });
 
   google.maps.event.addListener(centerMarker, 'click', () => {
-    console.log('marker clicked');
   });
 
   Landmarks.forEach((result) => {
@@ -415,30 +416,57 @@ function initMap(results) {
 }
 // #endregion map
 
-$(document).ready(() => {
-  const geoCoordinatesPromise = getGeoCodingInfoOfSearchedPlace(' Nigeria,     Lagos    ,     Lagos     Island,     Lagos     ');
+$('#submit-button').click((event) => {
+  event.preventDefault();
+  const searchString = $('#mainInput').val();
+  $('#mainInput').val('');
+  $('.suggestions').remove();
+  if (!searchString) {
+    $('#mainInput').focus();
+    $('#autocomplete').append('<div class="input-error"> Please type in a name of a place! </div>');
+    setTimeout(() => {
+      $('.input-error').remove();
+    }, 3000);
+    return; // Do nothing if searchString is empty
+  }
+  const geoCoordinatesPromise = getGeoCodingInfoOfSearchedPlace(searchString);
   geoCoordinatesPromise.then((params) => {
     const { Latitude, Longitude } = params;
     return getWeatherInfoOfSearchedPlace(Latitude, Longitude);
   })
     .then((res) => {
-      console.log(res);
-      const currentMetricSystem = TemperatureConverter.getCurrentMetricSystem();
+      const currentMetricSystem = TemperatureConverter.getCurrentMetricSystem() || 'celsius';
+      console.log('hacky metrics: ', currentMetricSystem, res);
       // retrieve previously set metric system from local storage
       const {
         humidity = 'Nothing here',
         geoCoordinates = 'Nothing here',
-        temperature = 'Nothing here',
         windSpeed = 'Nothing here',
         currentWeather = 'Nothing here',
       } = res;
-      $('#humidity').append(humidity);
-      $('#weather').append(currentWeather);
-      $('#temperature').append(temperature);
-      $('#windspeed').append(windSpeed);
+      let { temperature = 'Nothing here' } = res; // separate it for sake of conversion
+      console.log('before convert: ', temperature);
+      if (currentMetricSystem === 'fahrenheit') {
+        console.log('fahrenheit here!');
+        const tempConverter = new TemperatureConverter();
+        temperature = tempConverter.convertToFahrenheit(temperature);
+      }
+      console.log('converted: ', temperature);
+      $('#name-of-place').text(searchString);
+      $('#humidity').text(humidity);
+      $('#weather').text(currentWeather);
+      $('#temperature').text(`${temperature}`);
+      $('#windspeed').text(windSpeed);
       $(`input[name=${currentMetricSystem}`).attr('checked', 'checked');
       return getLandmarksAroundSearchedPlace(geoCoordinates);
     })
     .then((result) => initMap(result))
     .catch((Error) => console.log(`This is from catch: ${Error} `));
+});
+
+$(document).ready(() => {
+  if (!TemperatureConverter.getCurrentMetricSystem()) {
+    TemperatureConverter.setCurrentMetricSystem('celsius');
+    // Set default metric system for temperature
+  }
 });

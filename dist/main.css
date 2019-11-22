@@ -169,6 +169,10 @@ input {
   background-color: #65436e;
 }
 
+.input-error {
+  color: red;
+}
+
 #search-results {
   width: 99vw;
   display: inline-block;
