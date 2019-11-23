@@ -1,6 +1,15 @@
-const APPLICATION_ID = localStorage.getItem('_appId');
-const APPLICATION_CODE = localStorage.getItem('_appCode');
+const APPLICATION_ID = localStorage.getItem('_hereAppId');
+const APPLICATION_CODE = localStorage.getItem('_hereAppCode');
 const OPENWEATHERMAP_APPID = localStorage.getItem('_openWeatherMapAppId');
+
+// this handles the navigation toggle functionality.
+$('.nav_handle-container').click(() => {
+  if ($('.toggled').is(':visible')) {
+    $('.toggled').hide(200);
+    return;
+  }
+  $('.toggled').show(200);
+});
 
 function insertSuggestionToTextbox(suggestion) {
   $('.suggestions').remove();
@@ -22,73 +31,6 @@ function createAndAppendAutoCompleteElements(suggestions) {
   });
   $('#autocomplete').append(result);
 }
-
-// #region temperature converter
-class TemperatureConverter {
-  convertToCelsius(temperature) {
-    this.celsTemp = (temperature - 32) * (5 / 9);
-    return Math.round(this.celsTemp);
-    // Rounding results to integer since decimals have precision problems
-  }
-
-  convertToFahrenheit(temperature) {
-    this.fahrTemp = temperature * (9 / 5) + 32;
-    return Math.round(this.fahrTemp);
-    // Rounding results to integer since decimals have precision problems
-  }
-
-  static getCurrentMetricSystem() {
-    return localStorage.getItem('_currMetricSystem');
-  }
-
-  static setCurrentMetricSystem(system) {
-    try {
-      localStorage.setItem('_currMetricSystem', system);
-    } catch (error) {
-      console.log('error saving metric system to local storage.');
-    }
-  }
-}
-
-// function to convert temperature between metric systems (celsius and fahrenheit)
-function convert(metricSystem) {
-  if (TemperatureConverter.getCurrentMetricSystem() === metricSystem) {
-    return; // Prevent from clicking same button more than once;
-  }
-  const value = $('#temperature').text(); // grab value to convert
-  TemperatureConverter.setCurrentMetricSystem(metricSystem);
-  // set currentMetricSystem to local storage.
-  const tempConverter = new TemperatureConverter(); // create new instance of the class
-  let newTemp;
-  if (metricSystem === 'celsius') {
-    $('input[name=fahrenheit]').prop('checked', false);
-    $('input[name="celsius"]').prop('checked', true);
-    newTemp = tempConverter.convertToCelsius(value);
-  } else { // must be fahrenheit
-    $('input[name="celsius"]').prop('checked', false);
-    $('input[name="fahrenheit"]').prop('checked', true);
-    newTemp = tempConverter.convertToFahrenheit(value);
-  }
-  $('#temperature').text(newTemp); // set converted value to element;
-}
-
-$(document).on('click', '#celsius-button', () => {
-  convert('celsius');
-});
-
-$(document).on('click', '#fahrenheit-button', () => {
-  convert('fahrenheit');
-});
-// #endregion temperature converter
-
-// this handles the navigation toggle functionality.
-$('.nav_handle-container').click(() => {
-  if ($('.toggled').is(':visible')) {
-    $('.toggled').hide(200);
-    return;
-  }
-  $('.toggled').show(200);
-});
 
 // #region auto suggestion
 const AUTOCOMPLETION_URL = 'https://autocomplete.geocoder.api.here.com/6.2/suggest.json';
@@ -216,7 +158,7 @@ function fetchGeoCodingInfoSuccessCallback(result) {
 
 function getGeoCodingInfoOfSearchedPlace(searchString) {
   if (!searchString) {
-    return 'Invalid value passed as parameter!';
+    throw new Error('Error fetching geocoding information: Invalid value passed as parameter!');
   }
 
   const GEOCODER_URL = 'https://geocoder.api.here.com/6.2/geocode.json';
@@ -225,12 +167,14 @@ function getGeoCodingInfoOfSearchedPlace(searchString) {
   return fetch(GEOCODER_URL + params)
     .then((response) => response.json()) // convert response to json object
     .then((response) => fetchGeoCodingInfoSuccessCallback(response))
-    .catch((error) => error);
+    .catch((error) => {
+      throw new Error(`Error fetching geocoding information: ${error} `);
+    });
 }
 
-function fetchWeatherInfoOfSearchedPlaceSuccessCallback(result) {
+function getWeatherInfoOfSearchedPlaceSuccessCallback(result) {
   if (result.cod !== 200) {
-    throw new Error(`Error fetching geocoding information: ${result.type} `);
+    throw new Error(`Error fetching weather information: ${result.type} `);
   }
   const weatherInfo = {};
   const {
@@ -263,21 +207,23 @@ function fetchWeatherInfoOfSearchedPlaceSuccessCallback(result) {
   return weatherInfo;
 }
 
-function getWeatherInfoOfSearchedPlace(lat, lon) {
-  if (!lat || !lon) {
-    throw new Error('Error fetching weather information.');
+function getWeatherInfoOfSearchedPlace(latLon, currentMetricSystem) {
+  if (!latLon || !currentMetricSystem) {
+    return new Error('Error fetching weather information. Invalid parameters!');
   }
+  const { Latitude, Longitude } = latLon;
+  const unit = currentMetricSystem === 'celsius' ? 'metric' : 'imperial';
   const OPENWEATHERMAP_URL = 'http://api.openweathermap.org/data/2.5/weather';
-  const params = `?lat=${lat}&lon=${lon}&appid=${OPENWEATHERMAP_APPID}&units=metric`;
+  const params = `?lat=${Latitude}&lon=${Longitude}&appid=${OPENWEATHERMAP_APPID}&units=${unit}`;
   return fetch(OPENWEATHERMAP_URL + params)
     .then((response) => response.json()) // convert response to json object
-    .then((result) => fetchWeatherInfoOfSearchedPlaceSuccessCallback(result))
-    .catch((error) => error);
+    .then((result) => getWeatherInfoOfSearchedPlaceSuccessCallback(result))
+    .catch((error) => new Error(`Error fetching weather information: ${error} `));
 }
 
 function getLandmarksAroundSearchedPlaceSuccessCallBack(result, geoCoord) {
   if ((!result || result.type === 'ApplicationError') || !geoCoord) {
-    throw new Error(`Error fetching geocoding information: ${result.type} `);
+    return new Error(`Error fetching landmarks: ${result.type}`);
   }
   const landmarks = [];
   const { Result } = result.Response.View[0];
@@ -315,7 +261,7 @@ function getLandmarksAroundSearchedPlaceSuccessCallBack(result, geoCoord) {
 
 function getLandmarksAroundSearchedPlace(geoCoordinates) {
   if (!geoCoordinates) {
-    throw new Error(`Error fetching geocoding information: ${geoCoordinates} `);
+    return new Error(`Error fetching landmarks: ${geoCoordinates}`);
   }
   const {
     lat = '',
@@ -327,7 +273,7 @@ function getLandmarksAroundSearchedPlace(geoCoordinates) {
   return fetch(GEOCODER_LANDMARKS_URL + params)
     .then((response) => response.json()) // convert response to json object
     .then((result) => getLandmarksAroundSearchedPlaceSuccessCallBack(result, geoCoordinates))
-    .catch((error) => error);
+    .catch((error) => new Error(`Error fetching landmarks: ${error}`));
 }
 
 // #endregion
@@ -336,6 +282,9 @@ function getLandmarksAroundSearchedPlace(geoCoordinates) {
 
 // Initialize and add the map
 function initMap(results) {
+  if (!results) {
+    return; // exit if there is no data for the map
+  }
   const { Landmarks, mainGeoCoord } = results;
 
   const icons = {
@@ -416,52 +365,103 @@ function initMap(results) {
 }
 // #endregion map
 
-$('#submit-button').click((event) => {
-  event.preventDefault();
-  const searchString = $('#mainInput').val();
-  $('#mainInput').val('');
-  $('.suggestions').remove();
-  if (!searchString) {
-    $('#mainInput').focus();
-    $('#autocomplete').append('<div class="input-error"> Please type in a name of a place! </div>');
-    setTimeout(() => {
-      $('.input-error').remove();
-    }, 3000);
-    return; // Do nothing if searchString is empty
+// #region temperature converter
+class TemperatureConverter {
+  static getCurrentMetricSystem() {
+    return localStorage.getItem('_currMetricSystem');
   }
+
+  static setCurrentMetricSystem(system) {
+    try {
+      localStorage.setItem('_currMetricSystem', system);
+    } catch (error) {
+      // do nothing. Use default: celsius
+    }
+  }
+
+  // function to convert temperature between metric systems (celsius and fahrenheit)
+  static convertTo(metricSystem) {
+    if (this.getCurrentMetricSystem() === metricSystem) {
+      return; // Prevent from clicking same button more than once;
+    }
+    this.setCurrentMetricSystem(metricSystem);
+    // set currentMetricSystem to local storage.
+    if (metricSystem === 'celsius') {
+      $('input[name=fahrenheit]').prop('checked', false);
+      $('input[name="celsius"]').prop('checked', true);
+    } else { // must be fahrenheit
+      $('input[name="celsius"]').prop('checked', false);
+      $('input[name="fahrenheit"]').prop('checked', true);
+    }
+    const searchString = $('#name-of-place').text(); // grab name of place and fetch info again
+    const geoCoordinatesPromise = getGeoCodingInfoOfSearchedPlace(searchString);
+    geoCoordinatesPromise.then((param) => {
+      const { Latitude, Longitude } = param; // get the geoCoordinates
+      const currentMetricSystem = this.getCurrentMetricSystem() || 'celsius';
+      // retrieve previously set metric system from localStorage or set 'celsius' if non exists
+      return getWeatherInfoOfSearchedPlace({ Latitude, Longitude }, currentMetricSystem);
+    })
+      .then((res) => {
+        const { temperature = 'Nothing here' } = res;
+        $('#temperature').html(`${temperature}&deg;`);
+      })
+      .catch((Error) => Error);
+  }
+}
+
+$(document).on('click', '#celsius-button', () => {
+  TemperatureConverter.convertTo('celsius');
+});
+
+$(document).on('click', '#fahrenheit-button', () => {
+  TemperatureConverter.convertTo('fahrenheit');
+});
+// #endregion temperature converter
+
+function fetchAll(searchString) {
   const geoCoordinatesPromise = getGeoCodingInfoOfSearchedPlace(searchString);
-  geoCoordinatesPromise.then((params) => {
-    const { Latitude, Longitude } = params;
-    return getWeatherInfoOfSearchedPlace(Latitude, Longitude);
+  geoCoordinatesPromise.then((param) => {
+    const { Latitude, Longitude } = param;
+    const currentMetricSystem = TemperatureConverter.getCurrentMetricSystem() || 'celsius';
+    // retrieve previously set metric system from localStorage or set 'celsius' if non exists
+    return getWeatherInfoOfSearchedPlace({ Latitude, Longitude }, currentMetricSystem);
   })
     .then((res) => {
       const currentMetricSystem = TemperatureConverter.getCurrentMetricSystem() || 'celsius';
-      console.log('hacky metrics: ', currentMetricSystem, res);
-      // retrieve previously set metric system from local storage
       const {
         humidity = 'Nothing here',
         geoCoordinates = 'Nothing here',
         windSpeed = 'Nothing here',
         currentWeather = 'Nothing here',
+        temperature = 'Nothing here',
       } = res;
-      let { temperature = 'Nothing here' } = res; // separate it for sake of conversion
-      console.log('before convert: ', temperature);
-      if (currentMetricSystem === 'fahrenheit') {
-        console.log('fahrenheit here!');
-        const tempConverter = new TemperatureConverter();
-        temperature = tempConverter.convertToFahrenheit(temperature);
-      }
-      console.log('converted: ', temperature);
       $('#name-of-place').text(searchString);
       $('#humidity').text(humidity);
       $('#weather').text(currentWeather);
-      $('#temperature').text(`${temperature}`);
       $('#windspeed').text(windSpeed);
       $(`input[name=${currentMetricSystem}`).attr('checked', 'checked');
+      $('#temperature').html(`${temperature}&deg;`);
       return getLandmarksAroundSearchedPlace(geoCoordinates);
     })
     .then((result) => initMap(result))
     .catch((Error) => console.log(`This is from catch: ${Error} `));
+}
+
+$('#submit-button').click((event) => {
+  event.preventDefault();
+  const searchString = $('#mainInput').val(); // grab the user's place of interest
+  $('#mainInput').val(''); // clear the text box
+  $('.suggestions').remove(); // remove suggestions
+  if (!searchString) {
+    $('#mainInput').focus(); // remain focused on the textbox
+    $('#autocomplete').append('<div class="input-error"> Please type in a name of a place! </div>');
+    // display error
+    setTimeout(() => {
+      $('.input-error').remove();
+    }, 3000); // clear error after 3 seconds
+    return; // Do nothing if searchString is empty
+  }
+  fetchAll(searchString);
 });
 
 $(document).ready(() => {
