@@ -11,6 +11,18 @@ $('.nav_handle-container').click(() => {
   $('.toggled').show(200);
 });
 
+function displayNotification(message, mode = 'default') {
+  if (!message || message === '') {
+    return; // take no action
+  }
+  $('#notifier').html(`<span class=${mode}>${message}</span>`);
+  $('#notifier').show(200);
+
+  setTimeout(() => {
+    $('#notifier').hide();
+  }, 3000);
+}
+
 function insertSuggestionToTextbox(suggestion) {
   $('.suggestions').remove();
   $('#mainInput').val(suggestion);
@@ -202,8 +214,10 @@ function getWeatherInfoOfSearchedPlaceSuccessCallback(result) {
 
   const {
     speed: windSpeed = 'Wind speed not found.',
+    deg: windDirection = 'Wind direction not found.',
   } = wind; // select only speed (renamed windSpeed)from the wind obj
-  weatherInfo.windSpeed = windSpeed; // insert windSpeed into weatherInfo obj
+  weatherInfo.windSpeed = windSpeed;
+  weatherInfo.windDirection = windDirection; // insert windDirection into weatherInfo obj
   return weatherInfo;
 }
 
@@ -269,7 +283,7 @@ function getLandmarksAroundSearchedPlace(geoCoordinates) {
   } = geoCoordinates;
   const GEOCODER_LANDMARKS_URL = 'https://reverse.geocoder.api.here.com/6.2/reversegeocode.json';
   // Mark the end of the match in a token.
-  const params = `?app_id=${APPLICATION_ID}&app_code=${APPLICATION_CODE}&mode=retrieveLandmarks&prox=${lat},${lon},1000`;
+  const params = `?app_id=${APPLICATION_ID}&app_code=${APPLICATION_CODE}&mode=retrieveLandmarks&prox=${lat},${lon},3000`;
   return fetch(GEOCODER_LANDMARKS_URL + params)
     .then((response) => response.json()) // convert response to json object
     .then((result) => getLandmarksAroundSearchedPlaceSuccessCallBack(result, geoCoordinates))
@@ -291,6 +305,7 @@ function initMap(results) {
     centerIcon: 'minImages/flag-red.png',
     landmarkIcon: 'minImages/flag-blue.png',
   };
+
 
   const center = {
     lat: mainGeoCoord.lat,
@@ -385,11 +400,14 @@ class TemperatureConverter {
       return; // Prevent from clicking same button more than once;
     }
     this.setCurrentMetricSystem(metricSystem);
+    let metricSystemSuffix; // Use to suffix the temperature according to metric system
     // set currentMetricSystem to local storage.
     if (metricSystem === 'celsius') {
+      metricSystemSuffix = 'C';
       $('input[name=fahrenheit]').prop('checked', false);
       $('input[name="celsius"]').prop('checked', true);
     } else { // must be fahrenheit
+      metricSystemSuffix = 'F';
       $('input[name="celsius"]').prop('checked', false);
       $('input[name="fahrenheit"]').prop('checked', true);
     }
@@ -403,7 +421,7 @@ class TemperatureConverter {
     })
       .then((res) => {
         const { temperature = 'Nothing here' } = res;
-        $('#temperature').html(`${temperature}&deg;`);
+        $('#temperature').html(`${temperature}&deg;${metricSystemSuffix}`);
       })
       .catch((Error) => Error);
   }
@@ -418,6 +436,22 @@ $(document).on('click', '#fahrenheit-button', () => {
 });
 // #endregion temperature converter
 
+// A function to parse wind direction from integer to words
+function parseWindDirection(windDirection) {
+  if (windDirection < 0 || windDirection > 360) {
+    return 'Invalid direction';
+  }
+  let direction = 'North';
+  if ((windDirection >= 90) && (windDirection < 180)) {
+    direction = 'East';
+  } else if ((windDirection >= 180) && (windDirection < 270)) {
+    direction = 'South';
+  } else if ((windDirection >= 270) && (windDirection < 360)) {
+    direction = 'West';
+  }
+  return direction;
+}
+
 function fetchAll(searchString) {
   const geoCoordinatesPromise = getGeoCodingInfoOfSearchedPlace(searchString);
   geoCoordinatesPromise.then((param) => {
@@ -428,19 +462,24 @@ function fetchAll(searchString) {
   })
     .then((res) => {
       const currentMetricSystem = TemperatureConverter.getCurrentMetricSystem() || 'celsius';
+      const metricSystem = currentMetricSystem === 'celsius' ? 'C' : 'F'; // used to suffix the temperature
       const {
         humidity = 'Nothing here',
         geoCoordinates = 'Nothing here',
         windSpeed = 'Nothing here',
+        windDirection = 'Nothing here',
         currentWeather = 'Nothing here',
         temperature = 'Nothing here',
       } = res;
+      const parsedWindDirection = parseWindDirection(windDirection);
+
       $('#name-of-place').text(searchString);
-      $('#humidity').text(humidity);
+      $('#humidity').text(`${humidity}%`);
       $('#weather').text(currentWeather);
-      $('#windspeed').text(windSpeed);
+      $('#windspeed').text(`${windSpeed}knots`);
+      $('#windDirection').text(parsedWindDirection);
       $(`input[name=${currentMetricSystem}`).attr('checked', 'checked');
-      $('#temperature').html(`${temperature}&deg;`);
+      $('#temperature').html(`${temperature}&deg;${metricSystem}`);
       return getLandmarksAroundSearchedPlace(geoCoordinates);
     })
     .then((result) => initMap(result))
@@ -469,4 +508,61 @@ $(document).ready(() => {
     TemperatureConverter.setCurrentMetricSystem('celsius');
     // Set default metric system for temperature
   }
+});
+
+const fbAppID = localStorage.getItem('_fbAppId');
+
+window.fbAsyncInit = () => {
+  // init the FB JS SDK
+  FB.init({
+    appId: fbAppID,
+    status: true,
+    xfbml: true,
+  });
+};
+
+function FBShareOp(weatherInfo) {
+  console.log(weatherInfo, fbAppID);
+  const {
+    city = 'null',
+    humidity = 'null',
+    windSpeed = 'null',
+    windDirection = 'null',
+    temp = 'null',
+    weather = 'null',
+  } = weatherInfo;
+
+  FB.ui({
+    method: 'share',
+    app_id: fbAppID,
+    redirect_uri: 'http://splendid-chicken-73.localtunnel.me/',
+    display: 'popup',
+    href: 'http://splendid-chicken-73.localtunnel.me/',
+    quote:
+      `
+                Local weather conditions at ${city}: 
+                Humidity - ${humidity}, 
+                Wind Speed - ${windSpeed},
+                Wind Direction - ${windDirection} 
+                Temperature - ${temp}, 
+                Current Weather - ${weather}   
+                `,
+  }, (response) => {
+    if (response && response.post_id) {
+      displayNotification('Successfully shared to facebook!');
+    } else {
+      displayNotification('Facebook share cancelled!');
+    }
+  });
+}
+
+$(document).on('click', '#fb-share', () => {
+  const weatherInfo = {};
+  weatherInfo.city = $('#name-of-place').text();
+  weatherInfo.humidity = $('#humidity').text();
+  weatherInfo.weather = $('#weather').text();
+  weatherInfo.windSpeed = $('#windspeed').text();
+  weatherInfo.windDirection = $('#windDirection').text();
+  weatherInfo.temp = `${$('#temperature').text()}`;
+  FBShareOp(weatherInfo);
 });
