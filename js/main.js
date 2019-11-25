@@ -401,18 +401,15 @@ class TemperatureConverter {
     if (this.getCurrentMetricSystem() === metricSystem) {
       return; // Prevent from clicking same button more than once;
     }
-    this.setCurrentMetricSystem(metricSystem);
-    let metricSystemSuffix; // Use to suffix the temperature according to metric system
-    // set currentMetricSystem to local storage.
     const searchString = $('#name-of-place').text(); // grab name of place and fetch info again
     const geoCoordinatesPromise = getGeoCodingInfoOfSearchedPlace(searchString);
     geoCoordinatesPromise.then((param) => {
       const { Latitude, Longitude } = param; // get the geoCoordinates
-      const currentMetricSystem = this.getCurrentMetricSystem() || 'celsius';
-      // retrieve previously set metric system from localStorage or set 'celsius' if non exists
-      return getWeatherInfoOfSearchedPlace({ Latitude, Longitude }, currentMetricSystem);
+      return getWeatherInfoOfSearchedPlace({ Latitude, Longitude }, metricSystem);
     })
       .then((res) => {
+        this.setCurrentMetricSystem(metricSystem); // set new metricSystem to local storage.
+        let metricSystemSuffix; // Use to suffix the temperature according to metric system
         if (metricSystem === 'celsius') {
           metricSystemSuffix = 'C';
           $('input[name=fahrenheit]').prop('checked', false);
