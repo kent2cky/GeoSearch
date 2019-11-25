@@ -199,10 +199,12 @@ function getWeatherInfoOfSearchedPlaceSuccessCallback(result) {
 
   weather.forEach((obj) => {
     const {
-      main: currentWeather = 'Main weather not found.',
-      // get only main from obj in the weather array and rename it 'currentWeather'
+      description: currentWeather = 'Main weather not found.',
+      icon,
+      // get weather details and icon from obj in the weather array and rename it 'currentWeather'
     } = obj;
     weatherInfo.currentWeather = currentWeather; // insert currentWeather into weatherInfo obj
+    weatherInfo.icon = icon;
   });
   const {
     humidity = 'Humidity not found.',
@@ -402,15 +404,6 @@ class TemperatureConverter {
     this.setCurrentMetricSystem(metricSystem);
     let metricSystemSuffix; // Use to suffix the temperature according to metric system
     // set currentMetricSystem to local storage.
-    if (metricSystem === 'celsius') {
-      metricSystemSuffix = 'C';
-      $('input[name=fahrenheit]').prop('checked', false);
-      $('input[name="celsius"]').prop('checked', true);
-    } else { // must be fahrenheit
-      metricSystemSuffix = 'F';
-      $('input[name="celsius"]').prop('checked', false);
-      $('input[name="fahrenheit"]').prop('checked', true);
-    }
     const searchString = $('#name-of-place').text(); // grab name of place and fetch info again
     const geoCoordinatesPromise = getGeoCodingInfoOfSearchedPlace(searchString);
     geoCoordinatesPromise.then((param) => {
@@ -420,6 +413,15 @@ class TemperatureConverter {
       return getWeatherInfoOfSearchedPlace({ Latitude, Longitude }, currentMetricSystem);
     })
       .then((res) => {
+        if (metricSystem === 'celsius') {
+          metricSystemSuffix = 'C';
+          $('input[name=fahrenheit]').prop('checked', false);
+          $('input[name="celsius"]').prop('checked', true);
+        } else { // must be fahrenheit
+          metricSystemSuffix = 'F';
+          $('input[name="celsius"]').prop('checked', false);
+          $('input[name="fahrenheit"]').prop('checked', true);
+        }
         const { temperature = 'Nothing here' } = res;
         $('#temperature').html(`${temperature}&deg;${metricSystemSuffix}`);
       })
@@ -436,18 +438,18 @@ $(document).on('click', '#fahrenheit-button', () => {
 });
 // #endregion temperature converter
 
-// A function to parse wind direction from integer to words
+// A utility function to parse wind direction from integer to words
 function parseWindDirection(windDirection) {
   if (windDirection < 0 || windDirection > 360) {
     return 'Invalid direction';
   }
-  let direction = 'North';
+  let direction = 'north';
   if ((windDirection >= 90) && (windDirection < 180)) {
-    direction = 'East';
+    direction = 'east';
   } else if ((windDirection >= 180) && (windDirection < 270)) {
-    direction = 'South';
+    direction = 'south';
   } else if ((windDirection >= 270) && (windDirection < 360)) {
-    direction = 'West';
+    direction = 'west';
   }
   return direction;
 }
@@ -467,15 +469,23 @@ function fetchAll(searchString) {
         humidity = 'Nothing here',
         geoCoordinates = 'Nothing here',
         windSpeed = 'Nothing here',
+        icon = ' ',
         windDirection = 'Nothing here',
         currentWeather = 'Nothing here',
         temperature = 'Nothing here',
       } = res;
       const parsedWindDirection = parseWindDirection(windDirection);
+      const weatherIconUrl = `http://openweathermap.org/img/wn/${icon}@2x.png`;
 
       $('#name-of-place').text(searchString);
       $('#humidity').text(`${humidity}%`);
       $('#weather').text(currentWeather);
+      $('#weather-icon').html(
+        `
+          <img src="${weatherIconUrl}" alt="${currentWeather}" height="${100}" width="${100}">
+
+        `,
+      );
       $('#windspeed').text(`${windSpeed}knots`);
       $('#windDirection').text(parsedWindDirection);
       $(`input[name=${currentMetricSystem}`).attr('checked', 'checked');
@@ -503,15 +513,8 @@ $('#submit-button').click((event) => {
   fetchAll(searchString);
 });
 
-$(document).ready(() => {
-  if (!TemperatureConverter.getCurrentMetricSystem()) {
-    TemperatureConverter.setCurrentMetricSystem('celsius');
-    // Set default metric system for temperature
-  }
-});
-
+// #region facebook share funcitonality
 const fbAppID = localStorage.getItem('_fbAppId');
-
 window.fbAsyncInit = () => {
   // init the FB JS SDK
   FB.init({
@@ -522,7 +525,6 @@ window.fbAsyncInit = () => {
 };
 
 function FBShareOp(weatherInfo) {
-  console.log(weatherInfo, fbAppID);
   const {
     city = 'null',
     humidity = 'null',
@@ -565,4 +567,12 @@ $(document).on('click', '#fb-share', () => {
   weatherInfo.windDirection = $('#windDirection').text();
   weatherInfo.temp = `${$('#temperature').text()}`;
   FBShareOp(weatherInfo);
+});
+// #endregion facebook
+
+$(document).ready(() => {
+  if (!TemperatureConverter.getCurrentMetricSystem()) {
+    TemperatureConverter.setCurrentMetricSystem('celsius');
+    // Set default metric system for temperature
+  }
 });
