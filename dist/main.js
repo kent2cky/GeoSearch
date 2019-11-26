@@ -302,7 +302,7 @@ function initMap(results) {
     return; // exit if there is no data for the map
   }
   const { Landmarks, mainGeoCoord } = results;
-
+  const nameOfPlace = $('#name-of-place').text();
   const icons = {
     centerIcon: 'minImages/flag-red.png',
     landmarkIcon: 'minImages/flag-blue.png',
@@ -326,6 +326,7 @@ function initMap(results) {
     animation: google.maps.Animation.BOUNCE,
     icon: icons.centerIcon,
     map,
+    title: nameOfPlace,
   });
 
   google.maps.event.addListener(centerMarker, 'click', () => {
@@ -343,6 +344,7 @@ function initMap(results) {
       animation: google.maps.Animation.DROP,
       icon: icons.landmarkIcon,
       map,
+      title: placeName,
     });
 
     // Add a click event to each marker.
@@ -408,7 +410,7 @@ class TemperatureConverter {
       return getWeatherInfoOfSearchedPlace({ Latitude, Longitude }, metricSystem);
     })
       .then((res) => {
-        this.setCurrentMetricSystem(metricSystem); // set currentMetricSystem to local storage.
+        this.setCurrentMetricSystem(metricSystem); // set new metricSystem to local storage.
         let metricSystemSuffix; // Use to suffix the temperature according to metric system
         if (metricSystem === 'celsius') {
           metricSystemSuffix = 'C';
