@@ -32,9 +32,6 @@
 
 <body>
     <div id="fb-root"></div>
-    <!-- <script async defer crossorigin="anonymous"
-        src="https://connect.facebook.net/en_GB/sdk.js#xfbml=1&version=v5.0&appId=378043272850469&autoLogAppEvents=1">
-        </script> -->
     <header>
         <nav class="nav-container">
             <h1>GeoSearch</h1>
@@ -62,7 +59,8 @@
         <div class="welcome-image">
             <!-- <img src="minImages/870-536x354-blur_2-grayscale.jpg" alt="image from unsplash"> -->
         </div>
-
+        <div id="modal">
+        </div>
         <div class="welcome">
             <h2>Welcome to GeoSearch</h2>
         </div>
@@ -74,18 +72,14 @@
                 <button id="submit-button">Search</button>
             </form>
         </section>
-        <section id="search-results" style="display: block">
+        <section id="search-results">
             <div class="about-place">
                 <h3 id="name-of-place"></h3>
-                <div class="image-primary">
+                <div>
                     <!--The div element for the map -->
                     <div id="map"></div>
                 </div>
 
-                <div class="nextprev">
-                    <div class="next"></div>
-                    <div class="prev"></div>
-                </div>
                 <h3 class="place-info">Place information</h3>
                 <table class="place-info">
                     <tr>
@@ -126,7 +120,7 @@
                 </table>
             </div>
             <div class="fb-quote"></div>
-            <button id="fb-share">share</button>
+            <button id="fb-share">share</button> <button class="button btn-back">Back</button>
         </section>
     </main>
     <footer>

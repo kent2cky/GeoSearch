@@ -1,6 +1,6 @@
 const gulp = require('gulp');
-const jshint = require('gulp-jshint');
-const babel = require('gulp-babel');
+// const jshint = require('gulp-jshint');
+// const babel = require('gulp-babel');
 const terser = require('gulp-terser');
 // const uglify = require('gulp-uglify');
 const browserSync = require('browser-sync').create();
