@@ -23,6 +23,10 @@ header {
 
 .suggestions {
   background: cadetblue;
+  cursor: pointer;
+  z-index: 20000000;
+  background: rgb(248, 245, 245);
+  text-align: center;
 }
 
 .nav-container {
@@ -107,10 +111,7 @@ input,
 #search-results,
 #submit-button,
 #fb-share,
-.landmarks span:nth-child(1),
-.landmarks span:nth-child(2),
-.landmarks span:nth-child(3),
-.landmarks span:nth-child(4) {
+#landmark {
   box-shadow: 0px 3px 6px #8f867b;
 }
 
@@ -130,9 +131,8 @@ input,
   font-size: 1.1em;
   line-height: 25px;
   text-align: center;
-  padding: 100px 24px;
   margin: 2px;
-  background-color: darkpgrey;
+  background-color: darkgrey;
 }
 
 #search-section {
@@ -174,12 +174,11 @@ input {
 }
 
 #search-results {
+  display: none;
   width: 99vw;
-  display: inline-block;
-  background-color: bihsque;
   margin: 1px;
   text-align: center;
-  margin: 100px 0px 170px 0px;
+  margin: 50px 0px 170px 0px;
   padding-bottom: 20px;
 }
 
@@ -189,26 +188,6 @@ input {
 
 .about-geosearch {
   padding: 15px;
-}
-
-.landmarks {
-  display: flex;
-  flex-flow: row wrap;
-  justify-content: space-evenly;
-  align-content: center;
-  margin: 5px 0 0 0;
-}
-
-.landmarks span:nth-child(1),
-.landmarks span:nth-child(2),
-.landmarks span:nth-child(3),
-.landmarks span:nth-child(4) {
-  width: 5.5em;
-  height: 5.5em;
-  background-image: url("minImages/Spinner-1s-200px.gif");
-  background-repeat: no-repeat;
-  background-size: contain;
-  border-radius: 5px;
 }
 
 table {
@@ -232,6 +211,7 @@ table {
   width: 75px;
   height: 28px;
   border: none;
+  cursor: pointer;
 }
 
 footer {
@@ -248,6 +228,73 @@ footer {
   width: 100%;
   /* The width is the width of the web page */
   background: gray;
+}
+
+#landmark {
+  width: 95vw;
+  padding: 20px 3px;
+  background: black;
+  position: relative;
+  display: flex;
+  flex-flow: column wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+#landmark>img {
+  margin: 20px 2px;
+  color: white;
+  height: 300px;
+  width: 320px
+}
+
+#landmark>div {
+  color: white;
+  text-transform: uppercase;
+}
+
+#modal {
+  position: fixed;
+  background: transparent;
+  width: 100%;
+  height: 100vh;
+  z-index: 500000;
+  top: 0px;
+  overflow: scroll;
+  display: none;
+  padding: 10vh 1vh;
+}
+
+.button {
+  padding: 6px 20px;
+  background-color: #3e064e;
+  color: white;
+  border: 0px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-close {
+  display: block;
+  position: relative;
+}
+
+#notifier {
+  display: flex;
+  flex-flow: column wrap;
+  justify-content: center;
+  align-items: center;
+  background: #9a68a7;
+  color: white;
+  border-radius: 5px;
+  text-align: center;
+  padding: 20px 3px;
+  position: relative;
+  margin: 20vh 20vw;
+}
+
+#notifier>span {
+  margin: 20px;
 }
 
 /* Style overrides for other screen sizes (mobile first
@@ -297,28 +344,28 @@ approach was used for the styling of this app) */
     padding: 0.8em 2em;
   }
 
-  .landmarks {
-    justify-content: center;
-  }
-
-  .landmarks span:nth-child(1),
-  .landmarks span:nth-child(2),
-  .landmarks span:nth-child(3),
-  .landmarks span:nth-child(4) {
-    width: 6em;
-    height: 6em;
-    margin: 0.4em;
-  }
 
   table {
     display: inline-block;
   }
 
-  .share {
-    padding-bottom: 10px;
+  #landmark {
+    width: 80vw;
+    margin: 0px auto;
   }
+
+  #modal {
+    padding: 10vh 0vw;
+  }
+
+  #landmark>img {
+    width: 400px;
+    height: 350px;
+  }
+
 }
 
+/* Media and screen of 800px and above */
 @media screen and (min-width: 800px) {
   html {
     font-size: 1em;
@@ -337,5 +384,20 @@ approach was used for the styling of this app) */
     width: 7.5em;
     height: 7.5em;
     margin: 0.4em;
+  }
+
+  #modal {
+    padding: 10vh 0vw;
+  }
+
+  #landmark {
+    width: 80%;
+    padding: 20px;
+    margin: 0px auto;
+  }
+
+  #landmark>img {
+    width: 500px;
+    height: 400px;
   }
 }

@@ -11,18 +11,6 @@ $('.nav_handle-container').click(() => {
   $('.toggled').show(200);
 });
 
-function displayNotification(message, mode = 'default') {
-  if (!message || message === '') {
-    return; // take no action
-  }
-  $('#notifier').html(`<span class=${mode}>${message}</span>`);
-  $('#notifier').show(200);
-
-  setTimeout(() => {
-    $('#notifier').hide();
-  }, 3000);
-}
-
 function insertSuggestionToTextbox(suggestion) {
   $('.suggestions').remove();
   $('#mainInput').val(suggestion);
@@ -42,6 +30,19 @@ function createAndAppendAutoCompleteElements(suggestions) {
     return `<div class="suggestions" id=${id} countrycode=${suggestion.countryCode} tabindex="0"> ${suggestion.label} </div>`;
   });
   $('#autocomplete').append(result);
+}
+
+function displayNotification(message) {
+  console.log(message)
+  if (!message || message === '') {
+    return; // take no action
+  }
+  $('#modal').html(`<div id="notifier"><span>${message}</span><button id="close-notifier" class="button">Ok</button></div>`);
+  $('#modal').show();
+
+  setTimeout(() => {
+    $('#modal').hide();
+  }, 3000);
 }
 
 // #region auto suggestion
@@ -289,7 +290,13 @@ function getLandmarksAroundSearchedPlace(geoCoordinates) {
   return fetch(GEOCODER_LANDMARKS_URL + params)
     .then((response) => response.json()) // convert response to json object
     .then((result) => getLandmarksAroundSearchedPlaceSuccessCallBack(result, geoCoordinates))
-    .catch((error) => new Error(`Error fetching landmarks: ${error}`));
+    .catch(() => {
+      displayNotification('No landmarks for this location!');
+      return {
+        Landmarks: [], // return empty landmarks array
+        mainGeoCoord: geoCoordinates
+      }
+    });
 }
 
 // #endregion
@@ -308,7 +315,7 @@ function initMap(results) {
     landmarkIcon: 'minImages/flag-blue.png',
   };
 
-
+  console.log('landmark is error = ', results);
   const center = {
     lat: mainGeoCoord.lat,
     lng: mainGeoCoord.lon,
@@ -350,25 +357,28 @@ function initMap(results) {
     // Add a click event to each marker.
     ((param, placeName) => {
       function findPlaceFromQueryCallback(response, status) {
-        $('#landmark-photo').remove(); // remove already displayed image
+        $('#modal').hide(); // remove already displayed image
         if (status !== 'OK') {
-          $('#search-results').append('<div id="landmark-photo"><span> No photo here!</span></div>');
           // if there is no photo
-          return;
+          displayNotification('No photo here!');
         }
         try {
           const { photos = 'No Photos', name = 'No name' } = response[0];
           const htmlPhotos = photos.map((photo) => {
             const photoUrl = photo.getUrl();
-            return `<div id="landmark-photo">
-          <span>${name}</span>
-          <img src="${photoUrl}" alt="${name}" height="${300}" width="${333}">
-           </div>`;
+            return `
+            <div id="landmark">
+          <div>${name}</div>
+          <img src="${photoUrl}" alt="${name}">
+          <button class="button btn-close">Close</button>
+          </div>
+          `;
           });
-          $('#search-results').append(htmlPhotos);
+          $('#modal').html(htmlPhotos);
+          $('#modal').show();
         } catch (error) {
-          $('#search-results').append('<div id="landmark-photo"><span>No photo here!</span></div>');
           // if there is no photo
+          displayNotification('No photo here!');
         }
       }
       const request = {
@@ -414,12 +424,12 @@ class TemperatureConverter {
         let metricSystemSuffix; // Use to suffix the temperature according to metric system
         if (metricSystem === 'celsius') {
           metricSystemSuffix = 'C';
-          $('input[name=fahrenheit]').prop('checked', false);
-          $('input[name="celsius"]').prop('checked', true);
+          $('#celsius-button').prop('checked', true);
+          $('#fahrenheit-button').prop('checked', false);
         } else { // must be fahrenheit
           metricSystemSuffix = 'F';
-          $('input[name="celsius"]').prop('checked', false);
-          $('input[name="fahrenheit"]').prop('checked', true);
+          $('#fahrenheit-button').prop('checked', true);
+          $('#celsius-button').prop('checked', false);
         }
         const { temperature = 'Nothing here' } = res;
         $('#temperature').html(`${temperature}&deg;${metricSystemSuffix}`);
@@ -487,12 +497,26 @@ function fetchAll(searchString) {
       );
       $('#windspeed').text(`${windSpeed}knots`);
       $('#windDirection').text(parsedWindDirection);
-      $(`input[name=${currentMetricSystem}`).attr('checked', 'checked');
+      $(`#${currentMetricSystem}-button`).attr('checked', 'checked');
       $('#temperature').html(`${temperature}&deg;${metricSystem}`);
+
+      $('#search-results').show(); // Display results
+      $('#search-section').hide(); // Hide search section
+      $('.welcome').hide();
       return getLandmarksAroundSearchedPlace(geoCoordinates);
     })
     .then((result) => initMap(result))
-    .catch((Error) => console.log(`This is from catch: ${Error} `));
+    .catch(() => {
+      console.log(`This is from catch:`); // ${Error} `);
+      displayNotification(`
+      Could not get information about the place you searched for.
+      Please add more details like the city and country and try again.
+      `);
+      $('#mainInput').focus(); // still the search textbox
+      $('.suggestions').remove(); // remove suggestions
+      $('#search-section').show(); // Hide search section
+      $('#search-results').hide(); // Display results
+    });
 }
 
 $('#submit-button').click((event) => {
@@ -502,6 +526,9 @@ $('#submit-button').click((event) => {
   $('.suggestions').remove(); // remove suggestions
   if (!searchString) {
     $('#mainInput').focus(); // remain focused on the textbox
+    if ($('.input-error').is(':visible')) {
+      return;
+    }
     $('#autocomplete').append('<div class="input-error"> Please type in a name of a place! </div>');
     // display error
     setTimeout(() => {
@@ -510,6 +537,7 @@ $('#submit-button').click((event) => {
     return; // Do nothing if searchString is empty
   }
   fetchAll(searchString);
+  $('.suggestions').remove(); // remove suggestions
 });
 
 // #region facebook share funcitonality
@@ -549,9 +577,10 @@ function FBShareOp(weatherInfo) {
                 Current Weather - ${weather}   
                 `,
   }, (response) => {
-    if (response && response.post_id) {
+    if (response) {
       displayNotification('Successfully shared to facebook!');
     } else {
+      console.log('cancelled!');
       displayNotification('Facebook share cancelled!');
     }
   });
@@ -574,4 +603,27 @@ $(document).ready(() => {
     TemperatureConverter.setCurrentMetricSystem('celsius');
     // Set default metric system for temperature
   }
+  localStorage.setItem('_fbAppId', '2698742886856960');
+  localStorage.setItem('_googleApiKey', 'AIzaSyAlJLXsOXejTeu7G6fEvh5d_HK4B8tDAsc');
+  localStorage.setItem('_hereAppCode', 'RReyGHAdvyqxdS3NS_RpSg');
+  localStorage.setItem('_hereAppId', 'GH3eunoNaCk0CltN1nYB');
+  localStorage.setItem('_openWeatherMapAppId', 'a30ca121ed1c4c7c5f67f742615dc20e');
 });
+
+$(document)
+  .on('click', '.btn-back', () => {
+    $('.suggestions').remove(); // remove suggestions
+    $('#search-section').show(); // Hide search section
+    $('#search-results').hide(); // Display results
+    $('#mainInput').focus(); // focus on the search textbox
+    $('#map').html(' ')
+  })
+  .on('click', '.btn-close', () => {
+    $('#modal').hide(); // hide landmark image
+  })
+  .on('click', '#search', () => {
+    $('#mainInput').focus(); // focus on the search textbox
+  })
+  .on('click', '#close-notifier', () => {
+    $('#modal').hide(); // hide notifier    
+  });
