@@ -9,6 +9,7 @@
         content="GeoSearch, DevC Capstone Project, Andela Facebook training, kent2ckymaduka@gmail.com, Ikenna Kennis Maduka">
     <meta name="author" content="kent2ckymaduka@gmail.com">
     <link rel="stylesheet" href="main.css" type="text/css">
+    <link rel="icon" href="favicon.ico?4" type="image/x-icon" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta property="og:url" content="http://splendid-chicken-73.localtunnel.me/" />
     <meta property="og:type" content="website" />
@@ -34,7 +35,9 @@
     <div id="fb-root"></div>
     <header>
         <nav class="nav-container">
-            <h1>GeoSearch</h1>
+            <a href="index.html">
+                <div class="logo"></div>
+            </a>
 
             <div class="nav_handle-container" type="button" aria-controls="navbarSupportedContent" aria-expanded="false"
                 aria-label="Toggle navigation">
@@ -56,15 +59,10 @@
         </nav>
     </header>
     <main>
-        <div class="welcome-image">
-            <!-- <img src="minImages/870-536x354-blur_2-grayscale.jpg" alt="image from unsplash"> -->
-        </div>
         <div id="modal">
         </div>
-        <div class="welcome">
-            <h2>Welcome to GeoSearch</h2>
-        </div>
         <section id="search-section">
+            <h2>WELCOME TO GEOSEARCH</h2>
             <p>Search for those places that interest you.</p>
             <form action="submit" autocomplete="off">
                 <input type="text" id="mainInput" class="autocomplete" autofocus>
@@ -80,41 +78,41 @@
                     <div id="map"></div>
                 </div>
 
-                <h3 class="place-info">Place information</h3>
+                <h3 class="place-info">Weather information</h3>
                 <table class="place-info">
                     <tr>
                         <td>Humidity</td>
-                        <td><span id="humidity"></span></td>
+                        <td class="value"><span id="humidity"></span></td>
                     </tr>
                     <tr>
                         <td>Weather</td>
-                        <td><span id="weather"></span></td>
-                        <td>
+                        <td class="value">
                             <div id="weather-icon"></div>
+                            <span id="weather"></span>
                         </td>
                     </tr>
-
                     <tr>
                         <td>Windspeed</td>
-                        <td><span id="windspeed"></span></td>
+                        <td class="value"><span id="windspeed"></span></td>
                     </tr>
                     <tr>
                         <td>Wind direction</td>
-                        <td><span id="windDirection"></span></td>
+                        <td class="value"><span id="windDirection"></span></td>
                     </tr>
                     <tr>
                         <td>Temperature</td>
-                        <td><span id="temperature"></span></td>
-                        <td>
-                            <div>
-                                <input type="radio" name="celsius" id="celsius-button" class="radio-button" />
-                                <label for="celsius-button" class="radio-button-click-target fb-quotable">
-                                    Celsius
+                        <td class="value">
+                            <span id="temperature"></span>
+                            <div id="radio-button">
+                                <label for="celsius-button">
+                                    &deg;C
+                                    <input type="radio" name="celsius" id="celsius-button" class="radio-button" />
                                 </label>
-                                <input type="radio" name="fahrenheit" id="fahrenheit-button" class="radio-button" />
-                                <label for="fahrenheit-button" class="radio-button-click-target fb-quotable">
-                                    Fahrenheit
+                                <label for="fahrenheit-button">
+                                    &deg;F
+                                    <input type="radio" name="fahrenheit" id="fahrenheit-button" class="radio-button" />
                                 </label>
+                            </div>
                         </td>
                     </tr>
                 </table>

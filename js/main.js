@@ -33,7 +33,6 @@ function createAndAppendAutoCompleteElements(suggestions) {
 }
 
 function displayNotification(message) {
-  console.log(message)
   if (!message || message === '') {
     return; // take no action
   }
@@ -291,11 +290,11 @@ function getLandmarksAroundSearchedPlace(geoCoordinates) {
     .then((response) => response.json()) // convert response to json object
     .then((result) => getLandmarksAroundSearchedPlaceSuccessCallBack(result, geoCoordinates))
     .catch(() => {
-      displayNotification('No landmarks for this location!');
+      displayNotification('No landmarks found for this location!');
       return {
         Landmarks: [], // return empty landmarks array
-        mainGeoCoord: geoCoordinates
-      }
+        mainGeoCoord: geoCoordinates,
+      };
     });
 }
 
@@ -314,8 +313,6 @@ function initMap(results) {
     centerIcon: 'minImages/flag-red.png',
     landmarkIcon: 'minImages/flag-blue.png',
   };
-
-  console.log('landmark is error = ', results);
   const center = {
     lat: mainGeoCoord.lat,
     lng: mainGeoCoord.lon,
@@ -386,6 +383,8 @@ function initMap(results) {
         fields: ['name', 'photos'],
       };
       google.maps.event.addListener(param, 'click', () => {
+        $('#modal').html('<div id="preloader"><img src="minImages/Spinner-1s-200px.gif"></div>');
+        $('#modal').show();
         const service = new google.maps.places.PlacesService(map);
         service.findPlaceFromQuery(request, findPlaceFromQueryCallback);
       });
@@ -491,7 +490,7 @@ function fetchAll(searchString) {
       $('#weather').text(currentWeather);
       $('#weather-icon').html(
         `
-          <img src="${weatherIconUrl}" alt="${currentWeather}" height="${100}" width="${100}">
+          <img src="${weatherIconUrl}" alt="${currentWeather}">
 
         `,
       );
@@ -499,15 +498,17 @@ function fetchAll(searchString) {
       $('#windDirection').text(parsedWindDirection);
       $(`#${currentMetricSystem}-button`).attr('checked', 'checked');
       $('#temperature').html(`${temperature}&deg;${metricSystem}`);
-
       $('#search-results').show(); // Display results
       $('#search-section').hide(); // Hide search section
       $('.welcome').hide();
       return getLandmarksAroundSearchedPlace(geoCoordinates);
     })
-    .then((result) => initMap(result))
+    .then((result) => {
+      initMap(result);
+      $('#modal').hide();
+    })
     .catch(() => {
-      console.log(`This is from catch:`); // ${Error} `);
+      $('#modal').hide();
       displayNotification(`
       Could not get information about the place you searched for.
       Please add more details like the city and country and try again.
@@ -536,6 +537,9 @@ $('#submit-button').click((event) => {
     }, 3000); // clear error after 3 seconds
     return; // Do nothing if searchString is empty
   }
+
+  $('#modal').html('<div id="preloader"><img src="minImages/Spinner-1s-200px.gif"></div>');
+  $('#modal').show();
   fetchAll(searchString);
   $('.suggestions').remove(); // remove suggestions
 });
@@ -580,7 +584,6 @@ function FBShareOp(weatherInfo) {
     if (response) {
       displayNotification('Successfully shared to facebook!');
     } else {
-      console.log('cancelled!');
       displayNotification('Facebook share cancelled!');
     }
   });
@@ -616,14 +619,18 @@ $(document)
     $('#search-section').show(); // Hide search section
     $('#search-results').hide(); // Display results
     $('#mainInput').focus(); // focus on the search textbox
-    $('#map').html(' ')
+    $('#map').html(' ');
   })
   .on('click', '.btn-close', () => {
     $('#modal').hide(); // hide landmark image
   })
   .on('click', '#search', () => {
+    $('.suggestions').remove(); // remove suggestions
+    $('#search-section').show(); // Hide search section
+    $('#search-results').hide(); // Display results
     $('#mainInput').focus(); // focus on the search textbox
+    $('#map').html(' ');
   })
   .on('click', '#close-notifier', () => {
-    $('#modal').hide(); // hide notifier    
+    $('#modal').hide(); // hide notifier
   });

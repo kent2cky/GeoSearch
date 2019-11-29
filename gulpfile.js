@@ -1,8 +1,6 @@
 const gulp = require('gulp');
-// const jshint = require('gulp-jshint');
-// const babel = require('gulp-babel');
+const babel = require('gulp-babel');
 const terser = require('gulp-terser');
-// const uglify = require('gulp-uglify');
 const browserSync = require('browser-sync').create();
 const imageMin = require('gulp-imagemin')
 const eslint = require('gulp-eslint');
@@ -23,17 +21,16 @@ gulp.task('processCSS', gulp.series((done) => {
 
 gulp.task('processJS', gulp.series((done) => {
 
-  gulp.src('js/*.js')
-    // .pipe(jshint({
-    // 	esversion: 6
-    // }))
-    // .pipe(jshint.reporter('default'))
+  gulp.src([
+    'node_modules/babel-polyfill/dist/polyfill.js',
+    'js/*.js'
+  ])
     .pipe(eslint())
     .pipe(eslint.format())
-    // .pipe(babel({
-    // 	presets: ['env']
-    // }))
-    // .pipe(terser())
+    .pipe(babel({
+      presets: ['env']
+    }))
+    .pipe(terser())
     .pipe(gulp.dest('dist'));
 
   done();
