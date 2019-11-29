@@ -1,0 +1,524 @@
+* {
+  box-sizing: border-box;
+}
+
+html {
+  color: #3d3535;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+body {
+  margin: 0px;
+}
+
+header {
+  display: flex;
+  background-color: #3e064e;
+  flex-flow: row wrap;
+  justify-content: space-around;
+  align-items: center;
+  margin: 0px;
+}
+
+.logo {
+  display: inline-block;
+
+  height: 38px;
+
+  width: 169px;
+
+  background: url(minImages/gs_logo.png);
+
+  background-repeat: no-repeat;
+
+  background-size: cover;
+
+  margin: 13px 1px;
+}
+
+.suggestions {
+  background: cadetblue;
+  cursor: pointer;
+  z-index: 20000000;
+  background: rgb(248, 245, 245);
+  text-align: center;
+}
+
+.nav-container {
+  display: inline-block;
+  position: relative;
+  width: 100%;
+  padding: 0px 15px 0px 15px;
+  color: white;
+}
+
+nav>h1 {
+  display: inline-block;
+  font-size: 1.7em;
+}
+
+.toggled {
+  display: none;
+}
+
+.toggled>ul {
+  list-style: none;
+  text-align: left;
+  padding: 0;
+  margin: 0;
+}
+
+.nav_handle-container {
+  position: relative;
+  height: 25px;
+  top: 22px;
+  width: 40px;
+  right: auto;
+  cursor: pointer;
+  float: right;
+  border: none;
+  background: inherit;
+}
+
+.nav-items-list>li {
+  padding: 10px;
+  margin: 1px;
+}
+
+#list a,
+footer a,
+a {
+  color: white;
+  text-decoration: none;
+}
+
+.nav_handle-container>span {
+  background: white;
+  height: 2px;
+  width: 30px;
+  margin: 0px;
+  position: absolute;
+  /* Apparently this centres the spans. Leave it like that.*/
+  right: 5px;
+}
+
+.nav_handle-container span:nth-child(1) {
+  top: 0;
+}
+
+.nav_handle-container span:nth-child(2) {
+  top: 8px;
+}
+
+.nav_handle-container span:nth-child(3) {
+  top: 17px;
+}
+
+main {
+  display: flex;
+  flex-flow: column wrap;
+  justify-content: center;
+  align-items: center;
+  padding: 0%;
+}
+
+#search-section,
+input,
+#search-results,
+#submit-button,
+#landmark {
+  box-shadow: 0px 3px 6px #8f867b;
+}
+
+.welcome-image>img {
+  width: 96%;
+  height: 200px;
+}
+
+.welcome-image {
+  background-color: cadetblue;
+  width: 90%;
+  height: 150px;
+}
+
+.welcome {
+  text-transform: uppercase;
+  font-size: 1.1em;
+  line-height: 25px;
+  text-align: center;
+  margin: 2px;
+  background-color: darkgrey;
+}
+
+h3,
+h2 {
+  text-transform: uppercase;
+  line-height: 1em;
+}
+
+#search-section {
+  display: flex;
+  flex-flow: column wrap;
+  align-items: center;
+  font-size: 1.2em;
+  padding: 100px 20px 170px 20px;
+  text-align: center;
+  margin: 10vh 0;
+}
+
+form {
+  text-align: center;
+}
+
+input {
+  display: block;
+  margin: 40px 40px 15px 40px;
+  height: 35px;
+  border: 0px;
+  border: 1px solid purple;
+  padding: 8px;
+}
+
+#submit-button {
+  background-color: #3e064e;
+  color: white;
+  border: 0px;
+  border-radius: 4px;
+  padding: 0.5em 1.3em;
+}
+
+#submit-button:hover {
+  background-color: #65436e;
+}
+
+.input-error {
+  color: red;
+}
+
+#search-results {
+  display: none;
+  width: 99vw;
+  margin: 1px;
+  text-align: center;
+  margin: 50px 0px 170px 0px;
+  padding-bottom: 20px;
+}
+
+table {
+  text-align: start;
+  margin: 1vh 10vw;
+  width: 80vw;
+  border-collapse: collapse;
+}
+
+td {
+  padding: 20px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  height: 50px;
+  vertical-align: bottom;
+
+}
+
+tr:hover {
+  background-color: #f5f5f5;
+}
+
+tr:nth-child(even) {
+  background-color: #c5bfbf;
+}
+
+tr:nth-child(even):hover {
+  background-color: #ddd8d8;
+}
+
+#weather-icon>img {
+  height: 70px;
+  width: 80px;
+  margin: 0%;
+}
+
+#radio-button {
+  display: block;
+  margin-top: 2vh;
+}
+
+#radio-button>label {
+  display: inline-block;
+  cursor: pointer;
+  margin-right: 1vh;
+
+}
+
+#celsius-button,
+#fahrenheit-button {
+  display: inline-block;
+  margin: 0;
+  padding: 0%;
+  width: 15px;
+  height: 15px;
+  border: 0px;
+  cursor: pointer;
+}
+
+
+#convert {
+  background-color: inherit;
+  padding: 3px;
+  border: 1px solid black;
+  border-radius: 3px;
+  color: inherit;
+}
+
+#fb-share {
+  background-image: url("minImages/facebook2.jpeg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  color: #3d353500;
+  width: 75px;
+  height: 28px;
+  border: none;
+  cursor: pointer;
+}
+
+footer {
+  color: white;
+  background: #3e064e;
+  padding: 24px;
+  text-align: center;
+}
+
+/* Set the size of the div element that contains the map */
+#map {
+  height: 400px;
+  /* The height is 400 pixels */
+  width: 100%;
+  /* The width is the width of the web page */
+  background: gray;
+}
+
+#landmark {
+  width: 95vw;
+  padding: 20px 3px;
+  background: black;
+  position: relative;
+  display: flex;
+  flex-flow: column wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+#landmark>img {
+  margin: 20px 2px;
+  color: white;
+  height: 55vh;
+  width: 70vw
+}
+
+#landmark>div {
+  color: white;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+#modal {
+  position: fixed;
+  background: transparent;
+  width: 100%;
+  height: 100vh;
+  z-index: 500000;
+  top: 0px;
+  overflow: scroll;
+  display: none;
+  padding: 5vh 1vh;
+}
+
+.button {
+  padding: 6px 20px;
+  background-color: #3e064e;
+  color: white;
+  border: 0px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-close {
+  display: block;
+  position: relative;
+}
+
+#notifier,
+#preloader {
+  display: flex;
+  flex-flow: column wrap;
+  justify-content: center;
+  align-items: center;
+  border-radius: 5px;
+  text-align: center;
+  padding: 20px 3px;
+  position: relative;
+  margin: 20vh 20vw;
+}
+
+#notifier {
+  background: #9a68a7;
+  color: white;
+}
+
+#notifier>span {
+  margin: 20px;
+}
+
+#preloader>img {
+  width: 20vw;
+  height: 15vh;
+}
+
+.about-geosearch {
+  display: flex;
+  flex-flow: column wrap;
+  align-items: center;
+  font-size: 1.2em;
+  padding: 10px 20px 20px 20px;
+  text-align: left;
+  margin: 1vh 2vw;
+  box-shadow: 0px 3px 6px #8f867b;
+}
+
+/* Style overrides for other screen sizes (mobile first
+approach was used for the styling of this app) */
+
+@media screen and (min-width: 500px) {
+  .nav_handle-container {
+    display: none;
+  }
+
+  .nav-container {
+    display: flex;
+    background-color: #3e064e;
+    flex-flow: row wrap;
+    justify-content: space-around;
+    align-items: center;
+    margin: 0px;
+  }
+
+  .toggled {
+    display: inline-block;
+  }
+
+  #list {
+    display: inline-block !important;
+  }
+
+  .nav-items-list>li {
+    display: inline;
+  }
+
+  .welcome,
+  #search-section,
+  #search-results {
+    width: 80%;
+  }
+
+
+  #search,
+  .search-link {
+    background-color: green;
+    border-radius: 4px;
+    padding: 0.6em;
+  }
+
+  .search-link {
+    margin-top: 1em;
+    padding: 0.4em
+  }
+
+  input {
+    width: 20em;
+    height: 3em;
+  }
+
+  #submit-button {
+    padding: 0.8em 2em;
+  }
+
+  #landmark {
+    width: 80vw;
+    margin: 0px auto;
+  }
+
+  #modal {
+    padding: 10vh 0vw;
+  }
+
+  #landmark>img {
+    width: 400px;
+    height: 350px;
+  }
+
+  table {
+    margin: 1vh 2vw;
+    width: 76vw;
+  }
+
+  #radio-button {
+    display: inline;
+    margin-left: 10vw;
+  }
+
+
+  #preloader>img {
+    width: 15vw;
+    height: 29vh;
+  }
+
+  .about-geosearch {
+    margin: 5vh 5vw;
+  }
+}
+
+/* Media and screen of 800px and above */
+@media screen and (min-width: 800px) {
+  html {
+    font-size: 1em;
+  }
+
+  input {
+    width: 30em;
+    height: 4em;
+  }
+
+  .landmarks span:nth-child(1),
+  .landmarks span:nth-child(2),
+  .landmarks span:nth-child(3),
+  .landmarks span:nth-child(4) {
+    width: 7.5em;
+    height: 7.5em;
+    margin: 0.4em;
+  }
+
+  #modal {
+    padding: 10vh 0vw;
+  }
+
+  #landmark {
+    width: 80%;
+    padding: 20px;
+    margin: 0px auto;
+  }
+
+  #landmark>img {
+    width: 500px;
+    height: 400px;
+  }
+
+  .about-geosearch {
+    margin: 5vh 20vw;
+  }
+
+  td.value {
+    text-align: center;
+  }
+
+}
