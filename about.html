@@ -14,10 +14,11 @@
 </head>
 
 <body>
-
     <header>
         <nav class="nav-container">
-            <h1><a href="index.html">GeoSearch</a></h1>
+            <a href="index.html">
+                <div class="logo"></div>
+            </a>
 
             <div class="nav_handle-container" type="button" aria-controls="navbarSupportedContent" aria-expanded="false"
                 aria-label="Toggle navigation">
@@ -34,26 +35,57 @@
                     <li id="getInspired">
                         <span><a id="search" href="index.html#search-section">Search</a></span>
                     </li>
-
                 </ul>
             </div>
         </nav>
     </header>
     <main>
-        <div class="welcome-image">
-            <img src="minImages/870-536x354-blur_2-grayscale.jpg" alt="image from unsplash">
-        </div>
-
+        <h1>About GeoSearch</h1>
         <div class="about-geosearch">
-            <h2>About GeoSearch</h2>
-
-            <p>GeoSearch is all about getting information about
+            <p>
+                <b>GeoSearch</b> is all about getting information about
                 that place you have always been interested in. You can search for any
                 location in the world and we'll get you information about that place.
             </p>
+            <p>
+                Start by typing in the name of a place and then click on the search button
+                and wait for the page to fetch the search results. When the results are ready
+                a page will appear which has a map view and some information about the current weather
+                of the place which was searched for.
+            </p>
+            <p>
+                There will be a red marker pointing to the location of the place that was searched
+                for in the map and then there may be blue markers on the map. The blue marker will be pointing
+                to landmarks or famous places around the location that was searched for.
+            </p>
+            <p>
+                User can click on any of the blue markers on the map to view a picture and the name of the
+                landmark to which the marker is pointing. However, not all landmarks may have a picture of it
+                saved in the cloud. In that case the app will indicate that there is no photo for that landmark.
+            </p>
+
+            <p>
+                Weather information that is retrieved about where the user searched for includes the current
+                <b>humidity</b>, <b>weather</b>, <b>windspeed and direction</b>, and <b>temperature</b>.
+                By default the temperature are returned in <b>celsius</b>, however user can choose <b>fahrenheit</b>
+                as their preferred unit by clicking on the appropriate option displayed under the temperature
+                value in the search results.
+            </p>
+
+            <p>
+                User can also share the weather information of the place that was searched for.
+                Just click on the <b>facebook share button</b> at the bottom of the page and a popup window will
+                appear where the user will see the the weather information already quoted for him to share.
+            </p>
+
+            <p>
+                User can also add any other information s/he wishes to add to the already quoted texts.
+                User can also choose where and who s/he wishes to view the post by using the popup as s/he
+                normally would use his/her facebook page.
+            </p>
+            <a class="search-link" href="index.html#search-section">Search</a>
         </div>
     </main>
-
     <footer>
         Email: <a href="mailto:kent2ckymaduka@gmail.com">kent2ckymaduka@gmail.com</a><br>
         Mobile: <a href="tel:+2347062685682">(+234)07062685682</a><br>
