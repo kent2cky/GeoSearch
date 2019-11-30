@@ -1,1 +1,636 @@
-"use strict";var _createClass=function(){function e(e,t){for(var n=0;n<t.length;n++){var o=t[n];o.enumerable=o.enumerable||!1,o.configurable=!0,"value"in o&&(o.writable=!0),Object.defineProperty(e,o.key,o)}}return function(t,n,o){return n&&e(t.prototype,n),o&&e(t,o),t}}();function _classCallCheck(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}var APPLICATION_ID=localStorage.getItem("_hereAppId"),APPLICATION_CODE=localStorage.getItem("_hereAppCode"),OPENWEATHERMAP_APPID=localStorage.getItem("_openWeatherMapAppId");function insertSuggestionToTextbox(e){$(".suggestions").remove(),$("#mainInput").val(e),$("#mainInput").focus()}function createAndAppendAutoCompleteElements(e){if($(".suggestions").remove(),e){var t=0,n=e.map((function(e){return'<div class="suggestions" id='+(t+=1)+" countrycode="+e.countryCode+' tabindex="0"> '+e.label+" </div>"}));$("#autocomplete").append(n)}else $("suggestions").remove()}function displayNotification(e){e&&""!==e&&($("#modal").html('<div id="notifier"><span>'+e+'</span><button id="close-notifier" class="button">Ok</button></div>'),$("#modal").show(),setTimeout((function(){$("#modal").hide()}),3e3))}$(".nav_handle-container").click((function(){$(".toggled").is(":visible")?$(".toggled").hide(200):$(".toggled").show(200)}));var AUTOCOMPLETION_URL="https://autocomplete.geocoder.api.here.com/6.2/suggest.json";function fetchGeoCodingInfoSuccessCallback(e){if(!e||"ApplicationError"===e.type)throw new Error("Error fetching geocoding information: "+e.type+" ");var t={},n=e.Response.View[0].Result;return(void 0===n?"Oops! No coordinates for this location":n).forEach((function(e){var n=e.Location.NavigationPosition[0],o=n.Latitude,i=void 0===o?"Oops! No coordinates for this location":o,r=n.Longitude,a=void 0===r?"Oops! No coordinates for this location":r;t.Latitude=i,t.Longitude=a})),t}function getGeoCodingInfoOfSearchedPlace(e){if(!e)throw new Error("Error fetching geocoding information: Invalid value passed as parameter!");var t=encodeURIComponent(e);return fetch("https://geocoder.api.here.com/6.2/geocode.json"+("?app_id="+APPLICATION_ID+"&app_code="+APPLICATION_CODE+"&searchtext="+t)).then((function(e){return e.json()})).then((function(e){return fetchGeoCodingInfoSuccessCallback(e)})).catch((function(e){throw new Error("Error fetching geocoding information: "+e+" ")}))}function getWeatherInfoOfSearchedPlaceSuccessCallback(e){if(200!==e.cod)throw new Error("Error fetching weather information: "+e.type+" ");var t={},n=e.coord,o=void 0===n?{}:n,i=e.weather,r=void 0===i?[]:i,a=e.main,c=void 0===a?{}:a,u=e.wind,s=void 0===u?{}:u;t.geoCoordinates=o,r.forEach((function(e){var n=e.description,o=void 0===n?"Main weather not found.":n,i=e.icon;t.currentWeather=o,t.icon=i}));var d=c.humidity,l=void 0===d?"Humidity not found.":d,h=c.temp,p=void 0===h?"Temperature not found.":h;t.humidity=l,t.temperature=p;var m=s.speed,f=void 0===m?"Wind speed not found.":m,g=s.deg,v=void 0===g?"Wind direction not found.":g;return t.windSpeed=f,t.windDirection=v,t}function getWeatherInfoOfSearchedPlace(e,t){if(!e||!t)return new Error("Error fetching weather information. Invalid parameters!");var n=e.Latitude,o=e.Longitude;return fetch("http://api.openweathermap.org/data/2.5/weather"+("?lat="+n+"&lon="+o+"&appid="+OPENWEATHERMAP_APPID+"&units="+("celsius"===t?"metric":"imperial"))).then((function(e){return e.json()})).then((function(e){return getWeatherInfoOfSearchedPlaceSuccessCallback(e)})).catch((function(e){return new Error("Error fetching weather information: "+e+" ")}))}function getLandmarksAroundSearchedPlaceSuccessCallBack(e,t){if(!e||"ApplicationError"===e.type||!t)return new Error("Error fetching landmarks: "+e.type);var n=[];return e.Response.View[0].Result.forEach((function(e){var t={},o=e.Location,i=o.LocationType,r=void 0===i?"Nothing here.":i,a=o.Name,c=void 0===a?"Nothing here":a,u=o.DisplayPosition,s=void 0===u?"Nothing here.":u,d=o.Address,l=d.Label,h=void 0===l?"Nothing here.":l,p=d.Country,m=void 0===p?"Nothing here":p,f=d.State,g=void 0===f?"Nothing here":f,v=d.City,$=void 0===v?"Nothing here":v;t.locationType=r,t.name=c,t.displayPosition=s,t.label=h,t.country=m,t.state=g,t.city=$,n.push(t)})),{Landmarks:n,mainGeoCoord:t}}function getLandmarksAroundSearchedPlace(e){if(!e)return new Error("Error fetching landmarks: "+e);var t=e.lat,n=void 0===t?"":t,o=e.lon;return fetch("https://reverse.geocoder.api.here.com/6.2/reversegeocode.json"+("?app_id="+APPLICATION_ID+"&app_code="+APPLICATION_CODE+"&mode=retrieveLandmarks&prox="+n+","+(void 0===o?"":o)+",3000")).then((function(e){return e.json()})).then((function(t){return getLandmarksAroundSearchedPlaceSuccessCallBack(t,e)})).catch((function(){return displayNotification("No landmarks found for this location!"),{Landmarks:[],mainGeoCoord:e}}))}function initMap(e){if(e){var t=e.Landmarks,n=e.mainGeoCoord,o=$("#name-of-place").text(),i="minImages/flag-red.png",r="minImages/flag-blue.png",a={lat:n.lat,lng:n.lon},c=new google.maps.Map(document.getElementById("map"),{zoom:11,center:a}),u=new google.maps.Marker({position:a,animation:google.maps.Animation.BOUNCE,icon:i,map:c,title:o});google.maps.event.addListener(u,"click",(function(){})),t.forEach((function(e){var t=e.displayPosition,n=t.Latitude,o=t.Longitude,i=e.name;!function(e,t){function n(e,t){$("#modal").hide(),"OK"!==t&&displayNotification("No photo here!");try{var n=e[0],o=n.photos,i=void 0===o?"No Photos":o,r=n.name,a=void 0===r?"No name":r,c=i.map((function(e){var t=e.getUrl();return'\n            <div id="landmark">\n          <div>'+a+'</div>\n          <img src="'+t+'" alt="'+a+'">\n          <button class="button btn-close">Close</button>\n          </div>\n          '}));$("#modal").html(c),$("#modal").show()}catch(e){displayNotification("No photo here!")}}var o={query:""+t,fields:["name","photos"]};google.maps.event.addListener(e,"click",(function(){$("#modal").html('<div id="preloader"><img src="minImages/Spinner-1s-200px.gif"></div>'),$("#modal").show(),new google.maps.places.PlacesService(c).findPlaceFromQuery(o,n)}))}(new google.maps.Marker({position:{lat:n,lng:o},animation:google.maps.Animation.DROP,icon:r,map:c,title:i}),i)}))}}$(document).on("click","#1",(function(){insertSuggestionToTextbox($("#1").text())})),$(document).on("click","#2",(function(){insertSuggestionToTextbox($("#2").text())})),$(document).on("click","#3",(function(){insertSuggestionToTextbox($("#3").text())})),$(document).on("click","#4",(function(){insertSuggestionToTextbox($("#4").text())})),$(document).on("click","#5",(function(){insertSuggestionToTextbox($("#5").text())})),$(document).on("keyup","#1",(function(e){13!==e.which&&32!==e.which||insertSuggestionToTextbox($("#1").text())})),$(document).on("keyup","#2",(function(e){13!==e.which&&32!==e.which||insertSuggestionToTextbox($("#2").text())})),$(document).on("keyup","#3",(function(e){13!==e.which&&32!==e.which||insertSuggestionToTextbox($("#3").text())})),$(document).on("keyup","#4",(function(e){13!==e.which&&32!==e.which||insertSuggestionToTextbox($("#4").text())})),$(document).on("keyup","#5",(function(e){13!==e.which&&32!==e.which||insertSuggestionToTextbox($("#5").text())})),$(".autocomplete").keyup((function(e){if(27!==e.which){var t=$(".autocomplete").val(),n="?query=\n  "+encodeURIComponent(t)+"\n  &beginHighlight=\n  "+encodeURIComponent("<mark>")+"\n  &endHighlight=\n  "+encodeURIComponent("</mark>")+"\n  &maxresults=5&app_id="+APPLICATION_ID+"\n  &app_code="+APPLICATION_CODE;fetch(AUTOCOMPLETION_URL+n).then((function(e){return e.json()})).then((function(e){createAndAppendAutoCompleteElements(e.suggestions)})).catch((function(e){return e}))}else $(".suggestions").remove()}));var TemperatureConverter=function(){function e(){_classCallCheck(this,e)}return _createClass(e,null,[{key:"getCurrentMetricSystem",value:function(){return localStorage.getItem("_currMetricSystem")}},{key:"setCurrentMetricSystem",value:function(e){try{localStorage.setItem("_currMetricSystem",e)}catch(e){}}},{key:"convertTo",value:function(e){var t=this;this.getCurrentMetricSystem()!==e&&getGeoCodingInfoOfSearchedPlace($("#name-of-place").text()).then((function(t){return getWeatherInfoOfSearchedPlace({Latitude:t.Latitude,Longitude:t.Longitude},e)})).then((function(n){t.setCurrentMetricSystem(e);var o=void 0;"celsius"===e?(o="C",$("#celsius-button").prop("checked",!0),$("#fahrenheit-button").prop("checked",!1)):(o="F",$("#fahrenheit-button").prop("checked",!0),$("#celsius-button").prop("checked",!1));var i=n.temperature,r=void 0===i?"Nothing here":i;$("#temperature").html(r+"&deg;"+o)})).catch((function(e){return e}))}}]),e}();function parseWindDirection(e){if(e<0||e>360)return"Invalid direction";var t="north";return e>=90&&e<180?t="east":e>=180&&e<270?t="south":e>=270&&e<360&&(t="west"),t}function fetchAll(e){getGeoCodingInfoOfSearchedPlace(e).then((function(e){return getWeatherInfoOfSearchedPlace({Latitude:e.Latitude,Longitude:e.Longitude},TemperatureConverter.getCurrentMetricSystem()||"celsius")})).then((function(t){var n=TemperatureConverter.getCurrentMetricSystem()||"celsius",o="celsius"===n?"C":"F",i=t.humidity,r=void 0===i?"Nothing here":i,a=t.geoCoordinates,c=void 0===a?"Nothing here":a,u=t.windSpeed,s=void 0===u?"Nothing here":u,d=t.icon,l=void 0===d?" ":d,h=t.windDirection,p=void 0===h?"Nothing here":h,m=t.currentWeather,f=void 0===m?"Nothing here":m,g=t.temperature,v=void 0===g?"Nothing here":g,I=parseWindDirection(p),y="http://openweathermap.org/img/wn/"+l+"@2x.png";return $("#name-of-place").text(e),$("#humidity").text(r+"%"),$("#weather").text(f),$("#weather-icon").html('\n          <img src="'+y+'" alt="'+f+'">\n\n        '),$("#windspeed").text(s+"knots"),$("#windDirection").text(I),$("#"+n+"-button").attr("checked","checked"),$("#temperature").html(v+"&deg;"+o),$("#search-results").show(),$("#search-section").hide(),$(".welcome").hide(),getLandmarksAroundSearchedPlace(c)})).then((function(e){initMap(e),$("#modal").hide()})).catch((function(){$("#modal").hide(),displayNotification("\n      Could not get information about the place you searched for.\n      Please add more details like the city and country and try again.\n      "),$("#mainInput").focus(),$(".suggestions").remove(),$("#search-section").show(),$("#search-results").hide()}))}$(document).on("click","#celsius-button",(function(){TemperatureConverter.convertTo("celsius")})),$(document).on("click","#fahrenheit-button",(function(){TemperatureConverter.convertTo("fahrenheit")})),$("#submit-button").click((function(e){e.preventDefault();var t=$("#mainInput").val();if($("#mainInput").val(""),$(".suggestions").remove(),!t){if($("#mainInput").focus(),$(".input-error").is(":visible"))return;return $("#autocomplete").append('<div class="input-error"> Please type in a name of a place! </div>'),void setTimeout((function(){$(".input-error").remove()}),3e3)}$("#modal").html('<div id="preloader"><img src="minImages/Spinner-1s-200px.gif"></div>'),$("#modal").show(),fetchAll(t),$(".suggestions").remove()}));var fbAppID=localStorage.getItem("_fbAppId");function FBShareOp(e){var t=e.city,n=void 0===t?"null":t,o=e.humidity,i=void 0===o?"null":o,r=e.windSpeed,a=void 0===r?"null":r,c=e.windDirection,u=void 0===c?"null":c,s=e.temp,d=void 0===s?"null":s,l=e.weather,h=void 0===l?"null":l;FB.ui({method:"share",app_id:fbAppID,redirect_uri:"http://splendid-chicken-73.localtunnel.me/",display:"popup",href:"http://splendid-chicken-73.localtunnel.me/",quote:"\n                Local weather conditions at "+n+": \n                Humidity - "+i+", \n                Wind Speed - "+a+",\n                Wind Direction - "+u+" \n                Temperature - "+d+", \n                Current Weather - "+h+"   \n                "},(function(e){displayNotification(e?"Successfully shared to facebook!":"Facebook share cancelled!")}))}window.fbAsyncInit=function(){FB.init({appId:fbAppID,status:!0,xfbml:!0})},$(document).on("click","#fb-share",(function(){var e={};e.city=$("#name-of-place").text(),e.humidity=$("#humidity").text(),e.weather=$("#weather").text(),e.windSpeed=$("#windspeed").text(),e.windDirection=$("#windDirection").text(),e.temp=""+$("#temperature").text(),FBShareOp(e)})),$(document).ready((function(){TemperatureConverter.getCurrentMetricSystem()||TemperatureConverter.setCurrentMetricSystem("celsius"),localStorage.setItem("_fbAppId","2698742886856960"),localStorage.setItem("_googleApiKey","AIzaSyAlJLXsOXejTeu7G6fEvh5d_HK4B8tDAsc"),localStorage.setItem("_hereAppCode","RReyGHAdvyqxdS3NS_RpSg"),localStorage.setItem("_hereAppId","GH3eunoNaCk0CltN1nYB"),localStorage.setItem("_openWeatherMapAppId","a30ca121ed1c4c7c5f67f742615dc20e")})),$(document).on("click",".btn-back",(function(){$(".suggestions").remove(),$("#search-section").show(),$("#search-results").hide(),$("#mainInput").focus(),$("#map").html(" ")})).on("click",".btn-close",(function(){$("#modal").hide()})).on("click","#search",(function(){$(".suggestions").remove(),$("#search-section").show(),$("#search-results").hide(),$("#mainInput").focus(),$("#map").html(" ")})).on("click","#close-notifier",(function(){$("#modal").hide()}));
+const APPLICATION_ID = localStorage.getItem('_hereAppId');
+const APPLICATION_CODE = localStorage.getItem('_hereAppCode');
+const OPENWEATHERMAP_APPID = localStorage.getItem('_openWeatherMapAppId');
+
+// this handles the navigation toggle functionality.
+$('.nav_handle-container').click(() => {
+  if ($('.toggled').is(':visible')) {
+    $('.toggled').hide(200);
+    return;
+  }
+  $('.toggled').show(200);
+});
+
+function insertSuggestionToTextbox(suggestion) {
+  $('.suggestions').remove();
+  $('#mainInput').val(suggestion);
+  $('#mainInput').focus();
+}
+
+function createAndAppendAutoCompleteElements(suggestions) {
+  $('.suggestions').remove(); // Remove displayed suggestions
+  // early exit input validation
+  if (!suggestions) {
+    $('suggestions').remove();
+    return;
+  }
+  let id = 0;
+  const result = suggestions.map((suggestion) => {
+    id += 1;
+    return `<div class="suggestions" id=${id} countrycode=${suggestion.countryCode} tabindex="0"> ${suggestion.label} </div>`;
+  });
+  $('#autocomplete').append(result);
+}
+
+function displayNotification(message) {
+  if (!message || message === '') {
+    return; // take no action
+  }
+  $('#modal').html(`<div id="notifier"><span>${message}</span><button id="close-notifier" class="button">Ok</button></div>`);
+  $('#modal').show();
+
+  setTimeout(() => {
+    $('#modal').hide();
+  }, 3000);
+}
+
+// #region auto suggestion
+const AUTOCOMPLETION_URL = 'https://autocomplete.geocoder.api.here.com/6.2/suggest.json';
+// click and keyboard events for autosuggestion.
+
+$(document).on('click', '#1', () => {
+  const suggestion = $('#1').text();
+  insertSuggestionToTextbox(suggestion);
+});
+
+$(document).on('click', '#2', () => {
+  const suggestion = $('#2').text();
+  insertSuggestionToTextbox(suggestion);
+});
+
+$(document).on('click', '#3', () => {
+  const suggestion = $('#3').text();
+  insertSuggestionToTextbox(suggestion);
+});
+
+$(document).on('click', '#4', () => {
+  const suggestion = $('#4').text();
+  insertSuggestionToTextbox(suggestion);
+});
+
+$(document).on('click', '#5', () => {
+  const suggestion = $('#5').text();
+  insertSuggestionToTextbox(suggestion);
+});
+
+$(document).on('keyup', '#1', (e) => {
+  if (e.which === 13 || e.which === 32) {
+    const suggestion = $('#1').text();
+    insertSuggestionToTextbox(suggestion);
+  }
+});
+
+$(document).on('keyup', '#2', (e) => {
+  if (e.which === 13 || e.which === 32) {
+    const suggestion = $('#2').text();
+    insertSuggestionToTextbox(suggestion);
+  }
+});
+
+$(document).on('keyup', '#3', (e) => {
+  if (e.which === 13 || e.which === 32) {
+    const suggestion = $('#3').text();
+    insertSuggestionToTextbox(suggestion);
+  }
+});
+
+$(document).on('keyup', '#4', (e) => {
+  if (e.which === 13 || e.which === 32) {
+    const suggestion = $('#4').text();
+    insertSuggestionToTextbox(suggestion);
+  }
+});
+
+$(document).on('keyup', '#5', (e) => {
+  if (e.which === 13 || e.which === 32) {
+    const suggestion = $('#5').text();
+    insertSuggestionToTextbox(suggestion);
+  }
+});
+
+$('.autocomplete').keyup((e) => {
+  // Exit on esc keypress event
+  if (e.which === 27) {
+    $('.suggestions').remove();
+    return;
+  }
+
+  const searchValue = $('.autocomplete').val(); // grab the value in the textbox here
+  // The search text which is the basis of the query
+  //  Mark the beginning of the match in a token.
+  // The upper limit the for number of suggestions to be included
+  //  Mark the end of the match in a token.
+  // in the response.  Default is set to 5.
+  const params = `?query=
+  ${encodeURIComponent(searchValue)}
+  &beginHighlight=
+  ${encodeURIComponent('<mark>')}
+  &endHighlight=
+  ${encodeURIComponent('</mark>')}
+  &maxresults=5&app_id=${APPLICATION_ID}
+  &app_code=${APPLICATION_CODE}`;
+
+  fetch(AUTOCOMPLETION_URL + params)
+    .then((response) => response.json()) // convert response to json object
+    .then((result) => {
+      const {
+        suggestions,
+      } = result;
+      createAndAppendAutoCompleteElements(suggestions);
+    })
+    .catch((error) => error);
+});
+
+// #endregion
+
+// #region fetch APIs
+
+function fetchGeoCodingInfoSuccessCallback(result) {
+  if (!result || result.type === 'ApplicationError') {
+    throw new Error(`Error fetching geocoding information: ${result.type} `);
+  }
+  const geoCoordinates = {};
+  const {
+    Result = 'Oops! No coordinates for this location',
+    // the array which contains geocoordinates
+  } = result.Response.View[0];
+  Result.forEach((res) => {
+    const {
+      Latitude = 'Oops! No coordinates for this location',
+      // an array containing the geocoordinate,
+      Longitude = 'Oops! No coordinates for this location',
+
+    } = res.Location.NavigationPosition[0];
+    geoCoordinates.Latitude = Latitude;
+    geoCoordinates.Longitude = Longitude;
+    // insert the geocoordinates to the geoCoordinates object
+  });
+  return geoCoordinates;
+}
+
+function getGeoCodingInfoOfSearchedPlace(searchString) {
+  if (!searchString) {
+    throw new Error('Error fetching geocoding information: Invalid value passed as parameter!');
+  }
+
+  const GEOCODER_URL = 'https://geocoder.api.here.com/6.2/geocode.json';
+  const urlEncodedSearchString = encodeURIComponent(searchString);
+  const params = `?app_id=${APPLICATION_ID}&app_code=${APPLICATION_CODE}&searchtext=${urlEncodedSearchString}`;
+  return fetch(GEOCODER_URL + params)
+    .then((response) => response.json()) // convert response to json object
+    .then((response) => fetchGeoCodingInfoSuccessCallback(response))
+    .catch((error) => {
+      throw new Error(`Error fetching geocoding information: ${error} `);
+    });
+}
+
+function getWeatherInfoOfSearchedPlaceSuccessCallback(result) {
+  if (result.cod !== 200) {
+    throw new Error(`Error fetching weather information: ${result.type} `);
+  }
+  const weatherInfo = {};
+  const {
+    coord = {},
+    weather = [],
+    main = {},
+    wind = {},
+  } = result; // get only weather, main and wind from returned json;
+  weatherInfo.geoCoordinates = coord;
+
+  weather.forEach((obj) => {
+    const {
+      description: currentWeather = 'Main weather not found.',
+      icon,
+      // get weather details and icon from obj in the weather array and rename it 'currentWeather'
+    } = obj;
+    weatherInfo.currentWeather = currentWeather; // insert currentWeather into weatherInfo obj
+    weatherInfo.icon = icon;
+  });
+  const {
+    humidity = 'Humidity not found.',
+    temp: temperature = 'Temperature not found.',
+  } = main; // select only humidity and temp (renamed 'temperature') from the 'main' object
+  weatherInfo.humidity = humidity;
+  weatherInfo.temperature = temperature;
+  // insert them into the weatherInfo object
+
+  const {
+    speed: windSpeed = 'Wind speed not found.',
+    deg: windDirection = 'Wind direction not found.',
+  } = wind; // select only speed (renamed windSpeed)from the wind obj
+  weatherInfo.windSpeed = windSpeed;
+  weatherInfo.windDirection = windDirection; // insert windDirection into weatherInfo obj
+  return weatherInfo;
+}
+
+function getWeatherInfoOfSearchedPlace(latLon, currentMetricSystem) {
+  if (!latLon || !currentMetricSystem) {
+    return new Error('Error fetching weather information. Invalid parameters!');
+  }
+  const { Latitude, Longitude } = latLon;
+  const unit = currentMetricSystem === 'celsius' ? 'metric' : 'imperial';
+  const OPENWEATHERMAP_URL = 'https://api.openweathermap.org/data/2.5/weather';
+  const params = `?lat=${Latitude}&lon=${Longitude}&appid=${OPENWEATHERMAP_APPID}&units=${unit}`;
+  return fetch(OPENWEATHERMAP_URL + params)
+    .then((response) => response.json()) // convert response to json object
+    .then((result) => getWeatherInfoOfSearchedPlaceSuccessCallback(result))
+    .catch((error) => new Error(`Error fetching weather information: ${error} `));
+}
+
+function getLandmarksAroundSearchedPlaceSuccessCallBack(result, geoCoord) {
+  if ((!result || result.type === 'ApplicationError') || !geoCoord) {
+    return new Error(`Error fetching landmarks: ${result.type}`);
+  }
+  const landmarks = [];
+  const { Result } = result.Response.View[0];
+  Result.forEach((obj) => {
+    const landmark = {};
+    const {
+      Location: {
+        LocationType = 'Nothing here.',
+        Name = 'Nothing here',
+        DisplayPosition = 'Nothing here.',
+        Address: {
+          Label = 'Nothing here.',
+          Country = 'Nothing here',
+          State = 'Nothing here',
+          City = 'Nothing here',
+        },
+      },
+    } = obj;
+
+    landmark.locationType = LocationType;
+    landmark.name = Name;
+    landmark.displayPosition = DisplayPosition;
+    landmark.label = Label;
+    landmark.country = Country;
+    landmark.state = State;
+    landmark.city = City;
+
+    landmarks.push(landmark);
+  });
+  return {
+    Landmarks: landmarks,
+    mainGeoCoord: geoCoord,
+  };
+}
+
+function getLandmarksAroundSearchedPlace(geoCoordinates) {
+  if (!geoCoordinates) {
+    return new Error(`Error fetching landmarks: ${geoCoordinates}`);
+  }
+  const {
+    lat = '',
+    lon = '',
+  } = geoCoordinates;
+  const GEOCODER_LANDMARKS_URL = 'https://reverse.geocoder.api.here.com/6.2/reversegeocode.json';
+  // Mark the end of the match in a token.
+  const params = `?app_id=${APPLICATION_ID}&app_code=${APPLICATION_CODE}&mode=retrieveLandmarks&prox=${lat},${lon},3000`;
+  return fetch(GEOCODER_LANDMARKS_URL + params)
+    .then((response) => response.json()) // convert response to json object
+    .then((result) => getLandmarksAroundSearchedPlaceSuccessCallBack(result, geoCoordinates))
+    .catch(() => {
+      displayNotification('No landmarks found for this location!');
+      return {
+        Landmarks: [], // return empty landmarks array
+        mainGeoCoord: geoCoordinates,
+      };
+    });
+}
+
+// #endregion
+
+// #region map
+
+// Initialize and add the map
+function initMap(results) {
+  if (!results) {
+    return; // exit if there is no data for the map
+  }
+  const { Landmarks, mainGeoCoord } = results;
+  const nameOfPlace = $('#name-of-place').text();
+  const icons = {
+    centerIcon: 'minImages/flag-red.png',
+    landmarkIcon: 'minImages/flag-blue.png',
+  };
+  const center = {
+    lat: mainGeoCoord.lat,
+    lng: mainGeoCoord.lon,
+  };
+
+  // The map, centered at mainCoordinate
+  // mainCoordinate is the location the user searched for
+  const map = new google.maps.Map(document.getElementById('map'), {
+    zoom: 11,
+    center,
+  });
+  // The marker, positioned at center
+  const centerMarker = new google.maps.Marker({
+    position: center,
+    animation: google.maps.Animation.BOUNCE,
+    icon: icons.centerIcon,
+    map,
+    title: nameOfPlace,
+  });
+
+  google.maps.event.addListener(centerMarker, 'click', () => {
+  });
+
+  Landmarks.forEach((result) => {
+    const { Latitude, Longitude } = result.displayPosition;
+    const { name: placeName } = result;
+
+    const marker = new google.maps.Marker({
+      position: {
+        lat: Latitude,
+        lng: Longitude,
+      },
+      animation: google.maps.Animation.DROP,
+      icon: icons.landmarkIcon,
+      map,
+      title: placeName,
+    });
+
+    // Add a click event to each marker.
+    ((param, placeName) => {
+      function findPlaceFromQueryCallback(response, status) {
+        $('#modal').hide(); // remove already displayed image
+        if (status !== 'OK') {
+          // if there is no photo
+          displayNotification('No photo here!');
+        }
+        try {
+          const { photos = 'No Photos', name = 'No name' } = response[0];
+          const htmlPhotos = photos.map((photo) => {
+            const photoUrl = photo.getUrl();
+            return `
+            <div id="landmark">
+          <div>${name}</div>
+          <img src="${photoUrl}" alt="${name}">
+          <button class="button btn-close">Close</button>
+          </div>
+          `;
+          });
+          $('#modal').html(htmlPhotos);
+          $('#modal').show();
+        } catch (error) {
+          // if there is no photo
+          displayNotification('No photo here!');
+        }
+      }
+      const request = {
+        query: `${placeName}`,
+        fields: ['name', 'photos'],
+      };
+      google.maps.event.addListener(param, 'click', () => {
+        $('#modal').html('<div id="preloader"><img src="minImages/Spinner-1s-200px.gif"></div>');
+        $('#modal').show();
+        const service = new google.maps.places.PlacesService(map);
+        service.findPlaceFromQuery(request, findPlaceFromQueryCallback);
+      });
+    })(marker, placeName);
+  });
+}
+// #endregion map
+
+// #region temperature converter
+class TemperatureConverter {
+  static getCurrentMetricSystem() {
+    return localStorage.getItem('_currMetricSystem');
+  }
+
+  static setCurrentMetricSystem(system) {
+    try {
+      localStorage.setItem('_currMetricSystem', system);
+    } catch (error) {
+      // do nothing. Use default: celsius
+    }
+  }
+
+  // function to convert temperature between metric systems (celsius and fahrenheit)
+  static convertTo(metricSystem) {
+    if (this.getCurrentMetricSystem() === metricSystem) {
+      return; // Prevent from clicking same button more than once;
+    }
+    const searchString = $('#name-of-place').text(); // grab name of place and fetch info again
+    const geoCoordinatesPromise = getGeoCodingInfoOfSearchedPlace(searchString);
+    geoCoordinatesPromise.then((param) => {
+      const { Latitude, Longitude } = param; // get the geoCoordinates
+      return getWeatherInfoOfSearchedPlace({ Latitude, Longitude }, metricSystem);
+    })
+      .then((res) => {
+        this.setCurrentMetricSystem(metricSystem); // set new metricSystem to local storage.
+        let metricSystemSuffix; // Use to suffix the temperature according to metric system
+        if (metricSystem === 'celsius') {
+          metricSystemSuffix = 'C';
+          $('#celsius-button').prop('checked', true);
+          $('#fahrenheit-button').prop('checked', false);
+        } else { // must be fahrenheit
+          metricSystemSuffix = 'F';
+          $('#fahrenheit-button').prop('checked', true);
+          $('#celsius-button').prop('checked', false);
+        }
+        const { temperature = 'Nothing here' } = res;
+        $('#temperature').html(`${temperature}&deg;${metricSystemSuffix}`);
+      })
+      .catch((Error) => Error);
+  }
+}
+
+$(document).on('click', '#celsius-button', () => {
+  TemperatureConverter.convertTo('celsius');
+});
+
+$(document).on('click', '#fahrenheit-button', () => {
+  TemperatureConverter.convertTo('fahrenheit');
+});
+// #endregion temperature converter
+
+// A utility function to parse wind direction from integer to words
+function parseWindDirection(windDirection) {
+  if (windDirection < 0 || windDirection > 360) {
+    return 'Invalid direction';
+  }
+  let direction = 'north';
+  if ((windDirection >= 90) && (windDirection < 180)) {
+    direction = 'east';
+  } else if ((windDirection >= 180) && (windDirection < 270)) {
+    direction = 'south';
+  } else if ((windDirection >= 270) && (windDirection < 360)) {
+    direction = 'west';
+  }
+  return direction;
+}
+
+function fetchAll(searchString) {
+  const geoCoordinatesPromise = getGeoCodingInfoOfSearchedPlace(searchString);
+  geoCoordinatesPromise.then((param) => {
+    const { Latitude, Longitude } = param;
+    const currentMetricSystem = TemperatureConverter.getCurrentMetricSystem() || 'celsius';
+    // retrieve previously set metric system from localStorage or set 'celsius' if non exists
+    return getWeatherInfoOfSearchedPlace({ Latitude, Longitude }, currentMetricSystem);
+  })
+    .then((res) => {
+      const currentMetricSystem = TemperatureConverter.getCurrentMetricSystem() || 'celsius';
+      const metricSystem = currentMetricSystem === 'celsius' ? 'C' : 'F'; // used to suffix the temperature
+      const {
+        humidity = 'Nothing here',
+        geoCoordinates = 'Nothing here',
+        windSpeed = 'Nothing here',
+        icon = ' ',
+        windDirection = 'Nothing here',
+        currentWeather = 'Nothing here',
+        temperature = 'Nothing here',
+      } = res;
+      const parsedWindDirection = parseWindDirection(windDirection);
+      const weatherIconUrl = `https://openweathermap.org/img/wn/${icon}@2x.png`;
+
+      $('#name-of-place').text(searchString);
+      $('#humidity').text(`${humidity}%`);
+      $('#weather').text(currentWeather);
+      $('#weather-icon').html(
+        `
+          <img src="${weatherIconUrl}" alt="${currentWeather}">
+
+        `,
+      );
+      $('#windspeed').text(`${windSpeed}knots`);
+      $('#windDirection').text(parsedWindDirection);
+      $(`#${currentMetricSystem}-button`).attr('checked', 'checked');
+      $('#temperature').html(`${temperature}&deg;${metricSystem}`);
+      $('#search-results').show(); // Display results
+      $('#search-section').hide(); // Hide search section
+      $('.welcome').hide();
+      return getLandmarksAroundSearchedPlace(geoCoordinates);
+    })
+    .then((result) => {
+      initMap(result);
+      $('#modal').hide();
+    })
+    .catch(() => {
+      $('#modal').hide();
+      displayNotification(`
+      Could not get information about the place you searched for.
+      Please add more details like the city and country and try again.
+      `);
+      $('#mainInput').focus(); // still the search textbox
+      $('.suggestions').remove(); // remove suggestions
+      $('#search-section').show(); // Hide search section
+      $('#search-results').hide(); // Display results
+    });
+}
+
+$('#submit-button').click((event) => {
+  event.preventDefault();
+  const searchString = $('#mainInput').val(); // grab the user's place of interest
+  $('#mainInput').val(''); // clear the text box
+  $('.suggestions').remove(); // remove suggestions
+  if (!searchString) {
+    $('#mainInput').focus(); // remain focused on the textbox
+    if ($('.input-error').is(':visible')) {
+      return;
+    }
+    $('#autocomplete').append('<div class="input-error"> Please type in a name of a place! </div>');
+    // display error
+    setTimeout(() => {
+      $('.input-error').remove();
+    }, 3000); // clear error after 3 seconds
+    return; // Do nothing if searchString is empty
+  }
+
+  $('#modal').html('<div id="preloader"><img src="minImages/Spinner-1s-200px.gif"></div>');
+  $('#modal').show();
+  fetchAll(searchString);
+  $('.suggestions').remove(); // remove suggestions
+});
+
+// #region facebook share funcitonality
+const fbAppID = localStorage.getItem('_fbAppId');
+window.fbAsyncInit = () => {
+  // init the FB JS SDK
+  FB.init({
+    appId: fbAppID,
+    status: true,
+    xfbml: true,
+  });
+};
+
+function FBShareOp(weatherInfo) {
+  const {
+    city = 'null',
+    humidity = 'null',
+    windSpeed = 'null',
+    windDirection = 'null',
+    temp = 'null',
+    weather = 'null',
+  } = weatherInfo;
+
+  FB.ui({
+    method: 'share',
+    app_id: fbAppID,
+    redirect_uri: 'http://splendid-chicken-73.localtunnel.me/',
+    display: 'popup',
+    href: 'http://splendid-chicken-73.localtunnel.me/',
+    quote:
+      `
+                Local weather conditions at ${city}: 
+                Humidity - ${humidity}, 
+                Wind Speed - ${windSpeed},
+                Wind Direction - ${windDirection} 
+                Temperature - ${temp}, 
+                Current Weather - ${weather}   
+                `,
+  }, (response) => {
+    if (response) {
+      displayNotification('Successfully shared to facebook!');
+    } else {
+      displayNotification('Facebook share cancelled!');
+    }
+  });
+}
+
+$(document).on('click', '#fb-share', () => {
+  const weatherInfo = {};
+  weatherInfo.city = $('#name-of-place').text();
+  weatherInfo.humidity = $('#humidity').text();
+  weatherInfo.weather = $('#weather').text();
+  weatherInfo.windSpeed = $('#windspeed').text();
+  weatherInfo.windDirection = $('#windDirection').text();
+  weatherInfo.temp = `${$('#temperature').text()}`;
+  FBShareOp(weatherInfo);
+});
+// #endregion facebook
+
+$(document).ready(() => {
+  if (!TemperatureConverter.getCurrentMetricSystem()) {
+    TemperatureConverter.setCurrentMetricSystem('celsius');
+    // Set default metric system for temperature
+  }
+  localStorage.setItem('_fbAppId', '2698742886856960');
+  localStorage.setItem('_googleApiKey', 'AIzaSyAlJLXsOXejTeu7G6fEvh5d_HK4B8tDAsc');
+  localStorage.setItem('_hereAppCode', 'RReyGHAdvyqxdS3NS_RpSg');
+  localStorage.setItem('_hereAppId', 'GH3eunoNaCk0CltN1nYB');
+  localStorage.setItem('_openWeatherMapAppId', 'a30ca121ed1c4c7c5f67f742615dc20e');
+});
+
+$(document)
+  .on('click', '.btn-back', () => {
+    $('.suggestions').remove(); // remove suggestions
+    $('#search-section').show(); // Hide search section
+    $('#search-results').hide(); // Display results
+    $('#mainInput').focus(); // focus on the search textbox
+    $('#map').html(' ');
+  })
+  .on('click', '.btn-close', () => {
+    $('#modal').hide(); // hide landmark image
+  })
+  .on('click', '#search', () => {
+    $('.suggestions').remove(); // remove suggestions
+    $('#search-section').show(); // Hide search section
+    $('#search-results').hide(); // Display results
+    $('#mainInput').focus(); // focus on the search textbox
+    $('#map').html(' ');
+  })
+  .on('click', '#close-notifier', () => {
+    $('#modal').hide(); // hide notifier
+  });

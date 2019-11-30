@@ -229,7 +229,7 @@ function getWeatherInfoOfSearchedPlace(latLon, currentMetricSystem) {
   }
   const { Latitude, Longitude } = latLon;
   const unit = currentMetricSystem === 'celsius' ? 'metric' : 'imperial';
-  const OPENWEATHERMAP_URL = 'http://api.openweathermap.org/data/2.5/weather';
+  const OPENWEATHERMAP_URL = 'https://api.openweathermap.org/data/2.5/weather';
   const params = `?lat=${Latitude}&lon=${Longitude}&appid=${OPENWEATHERMAP_APPID}&units=${unit}`;
   return fetch(OPENWEATHERMAP_URL + params)
     .then((response) => response.json()) // convert response to json object
@@ -483,7 +483,7 @@ function fetchAll(searchString) {
         temperature = 'Nothing here',
       } = res;
       const parsedWindDirection = parseWindDirection(windDirection);
-      const weatherIconUrl = `http://openweathermap.org/img/wn/${icon}@2x.png`;
+      const weatherIconUrl = `https://openweathermap.org/img/wn/${icon}@2x.png`;
 
       $('#name-of-place').text(searchString);
       $('#humidity').text(`${humidity}%`);
