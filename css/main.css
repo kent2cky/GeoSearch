@@ -272,7 +272,7 @@ tr:nth-child(even):hover {
 }
 
 #fb-share {
-  background-image: url("minImages/facebook2.jpeg");
+  background-image: url("../minImages/facebook2.jpeg");
   background-repeat: no-repeat;
   background-size: contain;
   color: #3d353500;
