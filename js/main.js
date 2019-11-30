@@ -568,9 +568,9 @@ function FBShareOp(weatherInfo) {
   FB.ui({
     method: 'share',
     app_id: fbAppID,
-    redirect_uri: 'http://splendid-chicken-73.localtunnel.me/',
+    redirect_uri: 'https://kent2cky.github.io/GeoSearch/',
     display: 'popup',
-    href: 'http://splendid-chicken-73.localtunnel.me/',
+    href: 'https://kent2cky.github.io/GeoSearch/',
     quote:
       `
                 Local weather conditions at ${city}: 
